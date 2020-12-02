@@ -1,17 +1,17 @@
-use crate::tools::file_handler::{
-  read_file,
-  split_lines
-};
-
 use std::{
   path::Path,
   collections::HashMap
 };
 
+use crate::tools::file_handler::{
+  read_file,
+  split_numbers
+};
+
 pub fn compute1() -> usize {
   let path = Path::new("data/first_day/input.txt");
   if let Ok(content) = read_file(path) {
-    if let Ok(vector) = split_lines(&content) {
+    if let Ok(vector) = split_numbers(&content) {
       let value = get_two_entries_sum_2020(&vector);
       return value[0]*value[1];
     }
@@ -22,7 +22,7 @@ pub fn compute1() -> usize {
 pub fn compute2() -> usize {
   let path = Path::new("data/first_day/input.txt");
   if let Ok(content) = read_file(path) {
-    if let Ok(vector) = split_lines(&content) {
+    if let Ok(vector) = split_numbers(&content) {
       let value = get_three_entries_sum_2020(&vector);
       return value[0]*value[1]*value[2];
     }

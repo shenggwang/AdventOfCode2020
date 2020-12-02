@@ -12,9 +12,17 @@ pub fn read_file(p: &Path) -> TResult<String> {
   read_to_string(p).map_err(|e| e.into())
 }
 
-pub fn split_lines(s: &String) -> TResult<Vec<usize>> {
+pub fn split_numbers(s: &String) -> TResult<Vec<usize>> {
   s.split_whitespace()
     .map(|x| x.parse::<usize>()
+    .map_err(|e| e.into())
+    )
+    .collect()
+}
+
+pub fn split_with_expression(s: &String, e: &str) -> TResult<Vec<String>> {
+  s.split(e)
+    .map(|x| x.parse::<String>()
     .map_err(|e| e.into())
     )
     .collect()
