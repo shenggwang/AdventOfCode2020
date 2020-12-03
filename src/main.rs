@@ -3,6 +3,13 @@ extern crate regex;
 pub mod tools;
 pub mod first_day;
 pub mod second_day;
+pub mod third_day;
+
+fn main() {
+  //first_day();
+  //second_day();
+  third_day();
+}
 
 #[allow(dead_code)]
 fn first_day() {
@@ -29,8 +36,14 @@ fn second_day() {
   );
 }
 
-fn main() {
-  //first_day();
-  second_day();
-
+#[allow(dead_code)]
+fn third_day() {
+  println!(
+    "Second day first part value: {:?}",
+    third_day::toboggan_trajectory::compute1()
+  );
+  println!(
+    "Second day second part value: {:?}",
+    third_day::toboggan_trajectory::compute2()
+  );
 }

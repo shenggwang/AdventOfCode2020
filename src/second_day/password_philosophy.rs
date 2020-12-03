@@ -85,3 +85,27 @@ fn second_part(password: &str, max: usize, min: usize, character: char) -> bool 
   }
   return false;
 }
+
+#[cfg(test)]
+mod test {
+  use super::*;
+
+  #[test]
+  fn test_first_part() {
+    let result1 = first_part("abcde", 3, 1, 'a');
+    assert_eq!(result1, true);
+    let result2 = first_part("cdefg", 3, 1, 'b');
+    assert_eq!(result2, false);
+    let result3 = first_part("ccccccccc", 9, 2, 'c');
+    assert_eq!(result3, true);
+  }
+  #[test]
+  fn test_second_part() {
+    let result1 = second_part("abcde", 3, 1, 'a');
+    assert_eq!(result1, true);
+    let result2 = second_part("cdefg", 3, 1, 'b');
+    assert_eq!(result2, false);
+    let result3 = second_part("ccccccccc", 9, 2, 'c');
+    assert_eq!(result3, false);
+  }
+}
