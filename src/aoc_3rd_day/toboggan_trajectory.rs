@@ -4,24 +4,24 @@ use std::{
   fs::File
 };
 
-pub fn compute1() -> usize {
-  let path = Path::new("data/third_day/input.txt");
-  let value: usize = count_trees(path);
+pub fn compute1() -> i32 {
+  let path = Path::new("data/3rd_day/input.txt");
+  let value: i32 = count_trees(path);
   return value;
 }
 
-pub fn compute2() -> usize {
-  let path = Path::new("data/third_day/input.txt");
-  let slope1: usize = count_trees_with_slope(path, 1, 1);
-  let slope2: usize = count_trees_with_slope(path, 3, 1);
-  let slope3: usize = count_trees_with_slope(path, 5, 1);
-  let slope4: usize = count_trees_with_slope(path, 7, 1);
-  let slope5: usize = count_trees_with_slope(path, 1, 2);
-  let value: usize = slope1 * slope2 * slope3 * slope4 * slope5;
+pub fn compute2() -> i64 {
+  let path = Path::new("data/3rd_day/input.txt");
+  let slope1: i64 = count_trees_with_slope(path, 1, 1).into();
+  let slope2: i64 = count_trees_with_slope(path, 3, 1).into();
+  let slope3: i64 = count_trees_with_slope(path, 5, 1).into();
+  let slope4: i64 = count_trees_with_slope(path, 7, 1).into();
+  let slope5: i64 = count_trees_with_slope(path, 1, 2).into();
+  let value: i64 = (slope1 * slope2 * slope3 * slope4 * slope5).into();
   return value;
 }
 
-fn count_trees(path: &Path) -> usize {
+fn count_trees(path: &Path) -> i32 {
   let file = File::open(path).expect("Unable to read file.");
   let buffer = BufReader::new(file);
   let (mut x, mut y) = (0, 0);
@@ -36,14 +36,13 @@ fn count_trees(path: &Path) -> usize {
     x += 3;
     y += 1;
     if x > size {
-      println!("end of line {} and {}", x, y);
       x = x - size - 1;
     }
   }
   return count;
 }
 
-fn count_trees_with_slope(path: &Path, right: usize, down: usize) -> usize {
+fn count_trees_with_slope(path: &Path, right: i32, down: i32) -> i32 {
   let file = File::open(path).expect("Unable to read file.");
   let buffer = BufReader::new(file);
   let (mut x, mut y, mut count) = (0, 0, 0);
@@ -58,7 +57,7 @@ fn count_trees_with_slope(path: &Path, right: usize, down: usize) -> usize {
     if character == '#' {
       count += 1;
     }
-    x += right;
+    x += right.wrapping_abs() as u32 as usize;
     y += 1;
     if x > size {
       x = x - size - 1;
@@ -73,22 +72,22 @@ mod test {
 
   #[test]
   fn test_count_trees() {
-    let path = Path::new("data/third_day/test_input.txt");
-    let value: usize = count_trees(path);
+    let path = Path::new("data/3rd_day/test_input.txt");
+    let value: i32 = count_trees(path);
     assert_eq!(value, 7);
 
-    let path = Path::new("data/third_day/test_input2.txt");
-    let value: usize = count_trees(path);
+    let path = Path::new("data/3rd_day/test_input2.txt");
+    let value: i32 = count_trees(path);
     assert_eq!(value, 16);
   }
 
   #[test]
   fn test_count_trees_with_slope() {
-    let path = Path::new("data/third_day/test_input2.txt");
-    let value: usize = count_trees_with_slope(path, 3, 1);
+    let path = Path::new("data/3rd_day/test_input2.txt");
+    let value: i32 = count_trees_with_slope(path, 3, 1);
     assert_eq!(value, 16);
-    let path = Path::new("data/third_day/test_input2.txt");
-    let value: usize = count_trees_with_slope(path, 2, 2);
+    let path = Path::new("data/3rd_day/test_input2.txt");
+    let value: i32 = count_trees_with_slope(path, 2, 2);
     assert_eq!(value, 4);
   }
 }

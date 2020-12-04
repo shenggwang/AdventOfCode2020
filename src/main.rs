@@ -1,26 +1,28 @@
 extern crate regex;
 
 pub mod tools;
-pub mod first_day;
-pub mod second_day;
-pub mod third_day;
+pub mod aoc_1st_day;
+pub mod aoc_2nd_day;
+pub mod aoc_3rd_day;
+pub mod aoc_4th_day;
 
 fn main() {
-  //first_day();
-  //second_day();
+  first_day();
+  second_day();
   third_day();
+  //fourth_day();
 }
 
 #[allow(dead_code)]
 fn first_day() {
   println!(
     "First day first part value: {:?}",
-    first_day::report_repair::compute1()
+    aoc_1st_day::report_repair::compute1()
   );
 
   println!(
     "First day second part value: {:?}",
-    first_day::report_repair::compute2()
+    aoc_1st_day::report_repair::compute2()
   );
 }
 
@@ -28,22 +30,35 @@ fn first_day() {
 fn second_day() {
   println!(
     "Second day first part value: {:?}",
-    second_day::password_philosophy::compute1()
+    aoc_2nd_day::password_philosophy::compute1()
   );
   println!(
     "Second day second part value: {:?}",
-    second_day::password_philosophy::compute2()
+    aoc_2nd_day::password_philosophy::compute2()
   );
 }
 
 #[allow(dead_code)]
 fn third_day() {
   println!(
-    "Second day first part value: {:?}",
-    third_day::toboggan_trajectory::compute1()
+    "Third day first part value: {:?}",
+    aoc_3rd_day::toboggan_trajectory::compute1()
   );
   println!(
-    "Second day second part value: {:?}",
-    third_day::toboggan_trajectory::compute2()
+    "Third day second part value: {:?}",
+    aoc_3rd_day::toboggan_trajectory::compute2()
+  );
+}
+
+#[allow(dead_code)]
+fn fourth_day() {
+  println!(
+    "Fourth day first part value: {:?}",
+    aoc_4th_day::passport_processing::compute1()
+  );
+
+  println!(
+    "Fourth day second part value: {:?}",
+    aoc_4th_day::passport_processing::compute2()
   );
 }

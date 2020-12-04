@@ -34,7 +34,7 @@ mod test {
 
   #[test]
   fn test_read_file() {
-    let path = Path::new("data/first_day/test_input.txt");
+    let path = Path::new("data/1st_day/test_input.txt");
     let res = read_file(path);
     assert!(res.is_ok());
     

@@ -8,23 +8,23 @@ use crate::tools::file_handler::{
   split_numbers
 };
 
-pub fn compute1() -> usize {
-  let path = Path::new("data/first_day/input.txt");
+pub fn compute1() -> i32 {
+  let path = Path::new("data/1st_day/input.txt");
   if let Ok(content) = read_file(path) {
     if let Ok(vector) = split_numbers(&content) {
       let value = get_two_entries_sum_2020(&vector);
-      return value[0]*value[1];
+      return (value[0] * value[1]) as i32;
     }
   }
   return 2020;
 }
 
-pub fn compute2() -> usize {
-  let path = Path::new("data/first_day/input.txt");
+pub fn compute2() -> i32 {
+  let path = Path::new("data/1st_day/input.txt");
   if let Ok(content) = read_file(path) {
     if let Ok(vector) = split_numbers(&content) {
       let value = get_three_entries_sum_2020(&vector);
-      return value[0]*value[1]*value[2];
+      return (value[0] * value[1] * value[2]) as i32;
     }
   }
   return 2020;
@@ -35,9 +35,9 @@ fn get_two_entries_sum_2020(v: &Vec<usize>) -> Vec<usize> {
   let mut map_for_vector = HashMap::new();
 
   for i in 0..v.len() {
-    let key:usize = 2020 - v[i];
+    let key = 2020 - v[i];
     if map_for_vector.contains_key(&key) {
-      let value:usize = map_for_vector[&key];
+      let value = map_for_vector[&key];
       two_size_vector.push(v[value]);
       two_size_vector.push(v[i]);
       break;
