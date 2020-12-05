@@ -2,14 +2,22 @@ use std::{
   error, 
   result,
   path::Path,
-  fs::{read_to_string}
+  io::{BufReader},
+  fs::{File, read_to_string}
 };
 
 type TResult<T> = result::Result<T, TError>;
 type TError = Box<dyn error::Error>;
 
-pub fn read_file(p: &Path) -> TResult<String> {
-  read_to_string(p).map_err(|e| e.into())
+pub fn get_buffer_file(p: &str) -> BufReader<File> {
+  let path = Path::new(p);
+  let file = File::open(path).expect("Unable to read file.");
+  BufReader::new(file)
+}
+
+pub fn read_file(p: &str) -> TResult<String> {
+  let path = Path::new(p);
+  read_to_string(path).map_err(|e| e.into())
 }
 
 pub fn split_numbers(s: &String) -> TResult<Vec<usize>> {
@@ -34,8 +42,7 @@ mod test {
 
   #[test]
   fn test_read_file() {
-    let path = Path::new("data/1st_day/test_input.txt");
-    let res = read_file(path);
+    let res = read_file("data/1st_day/test_input.txt");
     assert!(res.is_ok());
     
     if let Ok(s) = res {

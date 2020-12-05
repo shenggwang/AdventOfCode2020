@@ -10,6 +10,7 @@ pub struct Passport {
 }
 
 impl Passport {
+
   pub fn new() -> Passport {
     Passport {
       birth_year: None,
@@ -23,7 +24,7 @@ impl Passport {
     }
   }
   pub fn birth_year(&mut self, value: String) {
-      self.birth_year = Some(value.parse().unwrap());
+    self.birth_year = Some(value.parse().unwrap());
   }
   pub fn issue_year(&mut self, value: String) {
     self.issue_year = Some(value.parse().unwrap());

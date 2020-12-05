@@ -1,10 +1,10 @@
 use std::{
-  path::Path,
-  io::{BufReader, prelude::*},
+  io::{BufReader, BufRead},
   fs::File
 };
 
 use crate::tools::file_handler::{
+  get_buffer_file,
   split_with_expression
 };
 
@@ -12,56 +12,56 @@ use crate::aoc_4th_day::passport::Passport;
 
 /// the result should be 228, missing one count
 pub fn compute1() -> usize {
-  let path = Path::new("data/4th_day/input.txt");
+  let path = "data/4th_day/input.txt";
   let value = count_valid_passport(path);
   return value;
 }
 
 /// the result should be 175, missing one count
 pub fn compute2() -> usize {
-  let path = Path::new("data/4th_day/input.txt");
+  let path = "data/4th_day/input.txt";
   let value = count_valid_passport_strict(path);
   return value;
 }
 
 /// Returning usize because we don't know what is the total size
-fn count_valid_passport(path: &Path) -> usize {
-  let file = File::open(path).expect("Unable to read file.");
-  let buffer = BufReader::new(file);
+fn count_valid_passport(path: &str) -> usize {
+  let buffer: BufReader<File> = get_buffer_file(path);
   let mut count = 0;
   let mut pp: Passport = Passport::new();
   for line in buffer.lines() {
     let text: String = line.expect("Unable to read line.");
     if text.is_empty() {
-      if pp.is_valid() {
-        count += 1;
-      }
       pp = Passport::new();
       continue;
     }
     let fields = split_with_expression(&text, " ").expect("Unable to split the String");
     pp = handle_fields(&fields, pp);
+    if pp.is_valid() {
+      count += 1;
+      pp = Passport::new();
+    }
   }
   return count;
 }
 
 /// Returning usize because we don't know what is the total size
-fn count_valid_passport_strict(path: &Path) -> usize {
-  let file = File::open(path).expect("Unable to read file.");
-  let buffer = BufReader::new(file);
+fn count_valid_passport_strict(path: &str) -> usize {
+  let buffer: BufReader<File> = get_buffer_file(path);
   let mut count = 0;
   let mut pp: Passport = Passport::new();
   for line in buffer.lines() {
     let text: String = line.expect("Unable to read line.");
     if text.is_empty() {
-      if pp.is_valid_strict() {
-        count += 1;
-      }
       pp = Passport::new();
       continue;
     }
     let fields = split_with_expression(&text, " ").expect("Unable to split the String");
     pp = handle_fields(&fields, pp);
+    if pp.is_valid_strict() {
+      count += 1;
+      pp = Passport::new();
+    }
   }
   return count;
 }
@@ -94,7 +94,7 @@ mod test {
   fn test_passport_is_valid() {
     
     let mut pp1:Passport = Passport::new();
-    pp1.birth_year(String::from("value"));
+    pp1.birth_year(String::from("1937"));
     assert_eq!(false, pp1.is_valid());
 
     let mut pp2:Passport = Passport::new();
@@ -115,19 +115,19 @@ mod test {
     pp3.hair_color(String::from("value"));
     pp3.eye_color(String::from("#fffffd"));
     pp3.passport_id(String::from("860033327"));
-    assert_eq!(false, pp3.is_valid());
+    assert_eq!(false, pp3.is_valid_strict());
   }
 
   #[test]
   fn test_count_valid_passport() {
-    let path = Path::new("data/4th_day/test_input.txt");
+    let path = "data/4th_day/test_input.txt";
     let value: usize = count_valid_passport(path);
     assert_eq!(value, 2);
   }
 
   #[test]
   fn test_count_valid_passport2() {
-    let path = Path::new("data/4th_day/test_input2.txt");
+    let path = "data/4th_day/test_input2.txt";
     let value: usize = count_valid_passport(path);
     assert_eq!(value, 7);
   }

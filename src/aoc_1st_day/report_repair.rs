@@ -1,5 +1,4 @@
 use std::{
-  path::Path,
   collections::HashMap
 };
 
@@ -9,8 +8,7 @@ use crate::tools::file_handler::{
 };
 
 pub fn compute1() -> i32 {
-  let path = Path::new("data/1st_day/input.txt");
-  if let Ok(content) = read_file(path) {
+  if let Ok(content) = read_file("data/1st_day/input.txt") {
     if let Ok(vector) = split_numbers(&content) {
       let value = get_two_entries_sum_2020(&vector);
       return (value[0] * value[1]) as i32;
@@ -20,8 +18,7 @@ pub fn compute1() -> i32 {
 }
 
 pub fn compute2() -> i32 {
-  let path = Path::new("data/1st_day/input.txt");
-  if let Ok(content) = read_file(path) {
+  if let Ok(content) = read_file("data/1st_day/input.txt") {
     if let Ok(vector) = split_numbers(&content) {
       let value = get_three_entries_sum_2020(&vector);
       return (value[0] * value[1] * value[2]) as i32;
@@ -58,8 +55,6 @@ fn get_three_entries_sum_2020(v: &Vec<usize>) -> Vec<usize> {
       
       while low < high {
         if vector[low] + vector[high] == sum {
-          //while low < high && vector[low] == vector[low + 1] {low += 1;}
-          //while low < high && vector[high] == vector[high - 1] {high -=1;}  
           return vec![vector[i], vector[low], vector[high]];
         } else if vector[low] + vector[high] < sum {
           low += 1;

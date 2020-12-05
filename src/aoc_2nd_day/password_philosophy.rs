@@ -1,5 +1,3 @@
-use std::path::Path;
-
 use crate::tools::file_handler::{
   read_file,
   split_with_expression
@@ -8,8 +6,7 @@ use crate::tools::file_handler::{
 use regex::Regex;
 
 pub fn compute1() -> i32 {
-  let path = Path::new("data/2nd_day/input.txt");
-  if let Ok(content) = read_file(path) {
+  if let Ok(content) = read_file("data/2nd_day/input.txt") {
     if let Ok(vector) = split_with_expression(&content, "\n") {
       let value = count_valid(&vector, true);
       return value;
@@ -19,8 +16,7 @@ pub fn compute1() -> i32 {
 }
 
 pub fn compute2() -> i32 {
-  let path = Path::new("data/2nd_day/input.txt");
-  if let Ok(content) = read_file(path) {
+  if let Ok(content) = read_file("data/2nd_day/input.txt") {
     if let Ok(vector) = split_with_expression(&content, "\n") {
       let value = count_valid(&vector, false);
       return value;
