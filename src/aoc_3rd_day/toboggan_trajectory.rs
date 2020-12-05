@@ -24,7 +24,7 @@ pub fn compute2() -> i64 {
 fn count_trees(path: &Path) -> i32 {
   let file = File::open(path).expect("Unable to read file.");
   let buffer = BufReader::new(file);
-  let (mut x, mut y) = (0, 0);
+  let mut x = 0;
   let mut count = 0;
   for line in buffer.lines() {
     let text = line.expect("Unable to read line.");
@@ -34,7 +34,6 @@ fn count_trees(path: &Path) -> i32 {
       count += 1;
     }
     x += 3;
-    y += 1;
     if x > size {
       x = x - size - 1;
     }

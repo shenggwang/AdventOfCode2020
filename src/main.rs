@@ -7,10 +7,10 @@ pub mod aoc_3rd_day;
 pub mod aoc_4th_day;
 
 fn main() {
-  first_day();
-  second_day();
-  third_day();
-  //fourth_day();
+  //first_day();
+  //second_day();
+  //third_day();
+  fourth_day();
 }
 
 #[allow(dead_code)]
