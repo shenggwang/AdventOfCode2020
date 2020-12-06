@@ -5,12 +5,14 @@ pub mod aoc_1st_day;
 pub mod aoc_2nd_day;
 pub mod aoc_3rd_day;
 pub mod aoc_4th_day;
+pub mod aoc_5th_day;
 
 fn main() {
   //first_day();
   //second_day();
   //third_day();
-  fourth_day();
+  //fourth_day();
+  fifth_day()
 }
 
 #[allow(dead_code)]
@@ -60,5 +62,18 @@ fn fourth_day() {
   println!(
     "Fourth day second part value: {:?}",
     aoc_4th_day::passport_processing::compute2()
+  );
+}
+
+#[allow(dead_code)]
+fn fifth_day() {
+  println!(
+    "Fifth day first part value: {:?}",
+    aoc_5th_day::binary_boarding::compute1()
+  );
+
+  println!(
+    "Fifth day second part value: {:?}",
+    aoc_5th_day::binary_boarding::compute2()
   );
 }

@@ -10,14 +10,12 @@ use crate::tools::file_handler::{
 
 use crate::aoc_4th_day::passport::Passport;
 
-/// the result should be 228, missing one count
 pub fn compute1() -> usize {
   let path = "data/4th_day/input.txt";
   let value = count_valid_passport(path);
   return value;
 }
 
-/// the result should be 175, missing one count
 pub fn compute2() -> usize {
   let path = "data/4th_day/input.txt";
   let value = count_valid_passport_strict(path);
