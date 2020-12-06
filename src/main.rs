@@ -6,13 +6,15 @@ pub mod aoc_2nd_day;
 pub mod aoc_3rd_day;
 pub mod aoc_4th_day;
 pub mod aoc_5th_day;
+pub mod aoc_6th_day;
 
 fn main() {
   //first_day();
   //second_day();
   //third_day();
   //fourth_day();
-  fifth_day()
+  //fifth_day();
+  sixth_day();
 }
 
 #[allow(dead_code)]
@@ -75,5 +77,18 @@ fn fifth_day() {
   println!(
     "Fifth day second part value: {:?}",
     aoc_5th_day::binary_boarding::compute2()
+  );
+}
+
+#[allow(dead_code)]
+fn sixth_day() {
+  println!(
+    "Sixth day first part value: {:?}",
+    aoc_6th_day::custom_customs::compute1()
+  );
+
+  println!(
+    "Sixth day second part value: {:?}",
+    aoc_6th_day::custom_customs::compute2()
   );
 }
