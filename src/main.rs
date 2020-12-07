@@ -7,6 +7,7 @@ pub mod aoc_3rd_day;
 pub mod aoc_4th_day;
 pub mod aoc_5th_day;
 pub mod aoc_6th_day;
+pub mod aoc_7th_day;
 
 fn main() {
   //first_day();
@@ -14,7 +15,8 @@ fn main() {
   //third_day();
   //fourth_day();
   //fifth_day();
-  sixth_day();
+  //sixth_day();
+  seventh_day();
 }
 
 #[allow(dead_code)]
@@ -90,5 +92,18 @@ fn sixth_day() {
   println!(
     "Sixth day second part value: {:?}",
     aoc_6th_day::custom_customs::compute2()
+  );
+}
+
+#[allow(dead_code)]
+fn seventh_day() {
+  println!(
+    "Sixth day first part value: {:?}",
+    aoc_7th_day::handy_haversacks::compute1()
+  );
+
+  println!(
+    "Sixth day second part value: {:?}",
+    aoc_7th_day::handy_haversacks::compute2()
   );
 }
