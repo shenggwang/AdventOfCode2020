@@ -1,7 +1,7 @@
 use std::{
   io::{BufReader, BufRead},
   fs::File,
-  collections::HashSet
+  collections::LinkedList,
 };
 
 use crate::tools::file_handler::get_buffer_file;
@@ -10,15 +10,15 @@ use crate::aoc_8th_day::instruction::Instruction;
 pub fn compute1() -> u32 {
   let path = "data/8th_day/input.txt";
   let list = get_execution_list(path);
-  let accumulator = get_accumulator(list);
+  let accumulator = get_accumulator_stopped_at_repeated_instruction(list).1;
   return accumulator as u32;
 }
 
 pub fn compute2() -> u32 {
   let path = "data/8th_day/input.txt";
   let list = get_execution_list(path);
-  let value = 2020;
-  return value;
+  let accumulator = get_accumulator_with_instruction_changed(list);
+  return accumulator as u32;
 }
 
 fn get_execution_list(path: &str) -> Vec<Instruction> {
@@ -28,59 +28,81 @@ fn get_execution_list(path: &str) -> Vec<Instruction> {
     .map(|line| {
       let text: String = line.expect("Unable to read line.");
       let instruction = Instruction::from(text);
-      //println!("{}:{}", instruction.command, instruction.number);
       instruction
     })
     .collect()
 }
 
-fn get_accumulator(list: Vec<Instruction>) -> usize {
-  let mut set = HashSet::<usize>::new();
+fn get_accumulator_stopped_at_repeated_instruction(list: Vec<Instruction>) -> (LinkedList::<usize>, usize, bool) {
+  let mut graph = LinkedList::<usize>::new();
   let mut accumulator = 0;
+  let mut dag = true;
   let mut index = 0;
-  loop {
+  while list.len() > index {
     let instruction = &list[index];
     match instruction.command.as_ref() {
       "acc" => {
-        if set.contains(&index) {
-          //println!("stop at index: {}", index);
+        if graph.contains(&index) {
+          dag = false;
           break;
         }
-        set.insert(index);
+        graph.push_back(index);
         accumulator += instruction.number;
         index += 1;
       },
       "jmp" => {
-        if set.contains(&index) {
-          //println!("stop at index: {}", index);
+        if graph.contains(&index) {
+          dag = false;
           break;
         }
-        set.insert(index);
+        graph.push_back(index);
         if instruction.number < 0 {
-          //println!("sub before: {}: {}", index, instruction.number);
           index -= instruction.number.wrapping_abs() as usize;
-          //println!("sub after: {}: {}", index, instruction.number);
         } else {
-          //println!("add before: {}: {}", index, instruction.number);
           index += instruction.number as usize;
-          //println!("add after: {}: {}", index, instruction.number);
         }
       },
       "nop" => {
-        if set.contains(&index) {
-          //println!("stop at index: {}", index);
+        if graph.contains(&index) {
+          dag = false;
           break;
         }
-        set.insert(index);
+        graph.push_back(index);
         index += 1;
       },
       _ => {
         println!("No instruction found");
+        dag = false;
         break;
       },
     }
-  } 
-  accumulator as usize
+  }
+  (graph, accumulator as usize, dag)
+}
+
+fn swap_instruction(mut new_list: Vec<Instruction>, index: usize) -> Vec<Instruction> {
+  if new_list[index].command == "jmp" {
+    new_list[index].command = "nop".to_string();
+  } else if new_list[index].command == "nop" {
+    new_list[index].command = "jmp".to_string();
+  }
+  new_list
+}
+
+fn get_accumulator_with_instruction_changed(list: Vec<Instruction>) -> usize {
+  let mut new_list = list.clone();
+  let mut graph = get_accumulator_stopped_at_repeated_instruction(list).0;
+  let mut count_value = 0;
+  while count_value < 1000 {
+    let index = graph.pop_back().unwrap();
+    new_list = swap_instruction(new_list, index);
+    let tuple = get_accumulator_stopped_at_repeated_instruction(new_list.clone());
+    if tuple.2 {
+      return tuple.1 as usize;
+    }
+    count_value += 1;
+  }
+  1
 }
 
 #[cfg(test)]
@@ -88,11 +110,19 @@ mod test {
   use super::*;
 
   #[test]
-  fn test_get_list_answers() {
+  fn test_get_accumulator_stopped_at_repeated_instruction() {
     let path = "data/8th_day/test_input.txt";
     let list = get_execution_list(path);
     assert_ne!(list.len(), 0);
-    let accumulator = get_accumulator(list);
+    let accumulator = get_accumulator_stopped_at_repeated_instruction(list).1;
     assert_eq!(accumulator, 5);
+  }
+
+  #[test]
+  fn test_get_accumulator_with_instruction_changed() {
+    let path = "data/8th_day/test_input.txt";
+    let list = get_execution_list(path);
+    let accumulator = get_accumulator_with_instruction_changed(list);
+    assert_eq!(accumulator, 6);
   }
 }

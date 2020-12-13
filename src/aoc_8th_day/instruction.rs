@@ -1,5 +1,6 @@
 use crate::tools::file_handler::split_with_expression;
 
+#[derive(Clone, Debug)]
 pub struct Instruction {
   pub command: String,
   pub number: isize,
