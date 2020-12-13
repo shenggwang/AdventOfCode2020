@@ -123,6 +123,6 @@ mod test {
     let path = "data/8th_day/test_input.txt";
     let list = get_execution_list(path);
     let accumulator = get_accumulator_with_instruction_changed(list);
-    assert_eq!(accumulator, 6);
+    assert_eq!(accumulator, 8);
   }
 }
