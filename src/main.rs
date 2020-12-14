@@ -11,6 +11,7 @@ pub mod aoc_7th_day;
 pub mod aoc_8th_day;
 pub mod aoc_9th_day;
 pub mod aoc_10th_day;
+pub mod aoc_11th_day;
 
 fn main() {
   //first_day();
@@ -22,7 +23,8 @@ fn main() {
   //seventh_day();
   //eighth_day();
   //nineth_day();
-  tenth_day();
+  //tenth_day();
+  eleventh_day();
 }
 
 #[allow(dead_code)]
@@ -150,5 +152,18 @@ fn tenth_day() {
   println!(
     "Tenth day second part value: {:?}",
     aoc_10th_day::adapter_array::compute2()
+  );
+}
+
+#[allow(dead_code)]
+fn eleventh_day() {
+  println!(
+    "Eleventh day first part value: {:?}",
+    aoc_11th_day::seating_system::compute1()
+  );
+
+  println!(
+    "Eleventh day second part value: {:?}",
+    aoc_11th_day::seating_system::compute2()
   );
 }

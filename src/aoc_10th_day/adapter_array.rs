@@ -67,7 +67,7 @@ mod test {
   use super::*;
 
   #[test]
-  fn test_get_diffs_multiplied() {
+  fn test_count_diffs() {
     let path = "data/10th_day/test_input.txt";
     let list = get_list_sorted(path);
     let diff_tuple = count_diffs(list);
@@ -76,7 +76,7 @@ mod test {
   }
 
   #[test]
-  fn test_get_list_same_answers() {
+  fn test_count_distinct_arrangements() {
     let path = "data/10th_day/test_input.txt";
     let list = get_list_sorted(path);
     let value = count_distinct_arrangements(&list);
