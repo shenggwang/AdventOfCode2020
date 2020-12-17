@@ -11,7 +11,8 @@ pub fn compute1() -> u32 {
   let map = &mut HashMap::new();
   let (width, height) = get_map_and_size(map, path);
   let tmp_map = &mut HashMap::new();
-  let final_map = recursive_set_rounds(&mut 0, tmp_map, map, width, height);
+  // Avoid stack overflow by limiting to 200 iterations, feel free to increment this 
+  let final_map = recursive_set_rounds(&mut 200, tmp_map, map, width, height);
   let occupied_seats = count_occupied_seats(final_map);
   return occupied_seats;
 }
@@ -66,20 +67,14 @@ fn recursive_set_rounds<'a>(count: &mut usize, previous_map: &'a mut HashMap<usi
     // 4 CORNERS and not a seat
     if position == 0 
         || position == width - 1 
-        || position == height * (width - 1)
-        || position == height * width - 1 
+        || position == width * (height - 1)
+        || position == width * height - 1 
         || seat == '.' {
       *map.entry(position).or_insert(seat) = seat;
-      if position == 8910 || position == 8909 {
-        println!("CONTINUED")
-      }
       continue;
     }
     // TOP
     else if position < width {
-      if position == 8910 || position == 8909 {
-        println!("TOP")
-      }
       list.push(position - 1);
       list.push(position + 1);
       list.push(position + width);
@@ -87,10 +82,7 @@ fn recursive_set_rounds<'a>(count: &mut usize, previous_map: &'a mut HashMap<usi
       list.push(position + width + 1);
     }
     // BOTTOM
-    else if position > (width - 1) * height {
-      if position == 8910 || position == 8909 {
-        println!("BOTTOM")
-      }
+    else if position > width * (height - 1) {
       list.push(position - 1);
       list.push(position + 1);
       list.push(position - width);
@@ -99,10 +91,6 @@ fn recursive_set_rounds<'a>(count: &mut usize, previous_map: &'a mut HashMap<usi
     }
     // LEFT
     else if position % width == 0 {
-      if position == 8910 || position == 8909 {
-        println!("left");
-        println!("position {} width {} boolean {}", position, width, position % width == 0);
-      }
       list.push(position + 1);
       list.push(position + width);
       list.push(position + width + 1);
@@ -111,10 +99,6 @@ fn recursive_set_rounds<'a>(count: &mut usize, previous_map: &'a mut HashMap<usi
     } 
     // RIGHT
     else if position % width == width - 1 {
-      //8910 BUG
-      if position == 8910 || position == 8909 {
-        println!("RIGHT")
-      }
       list.push(position - 1);
       list.push(position + width);
       list.push(position + width - 1);
@@ -123,9 +107,6 @@ fn recursive_set_rounds<'a>(count: &mut usize, previous_map: &'a mut HashMap<usi
     }
     // any other position
     else {
-      if position == 8910 || position == 8909 {
-        println!("OTHERS")
-      }
       list.push(position + 1);
       list.push(position - 1);
       list.push(position + width);
@@ -139,13 +120,11 @@ fn recursive_set_rounds<'a>(count: &mut usize, previous_map: &'a mut HashMap<usi
     *map.entry(position).or_insert(seat) = handle_value(previous_map, list, position);
   }
 
-  //println!("------------------//-----------------");
-  //show_map(map.clone(), width, height);
+  println!("------------------//-----------------");
+  show_map(map.clone(), width, height);
   
-  *count += 1;
-
-  // Avoid stack overflow by limiting to 20 iterations
-  if count > &mut 20 || previous_map == map {
+  *count -= 1;
+  if count == &mut 0 || previous_map == map {
     return previous_map;
   }
   // Although it is named previous map, it was updated to be new map. And the map become to be previous map
@@ -209,7 +188,8 @@ mod test {
     let map = &mut HashMap::new();
     let (width, height) = get_map_and_size(map, path);
     let tmp_map = &mut HashMap::new();
-    let final_map = recursive_set_rounds(&mut 0, tmp_map, map, width, height);
+    // Avoid stack overflow by limiting to 20 iterations, feel free to increment this
+    let final_map = recursive_set_rounds(&mut 20, tmp_map, map, width, height);
     let occupied_seats = count_occupied_seats(final_map);
     assert_eq!(occupied_seats, 37);
   }
