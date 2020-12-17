@@ -157,10 +157,12 @@ fn tenth_day() {
 
 #[allow(dead_code)]
 fn eleventh_day() {
+  /*
   println!(
     "Eleventh day first part value: {:?}",
     aoc_11th_day::seating_system::compute1()
   );
+  */
 
   println!(
     "Eleventh day second part value: {:?}",
