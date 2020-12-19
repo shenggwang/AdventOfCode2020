@@ -5,25 +5,24 @@ use std::{
 };
 
 use crate::tools::file_handler::get_buffer_file;
+use crate::aoc_11th_day::enums::Movement;
 
 pub fn compute1() -> u32 {
   let path = "data/11th_day/input.txt";
   let map = &mut HashMap::new();
   let (width, height) = get_map_and_size(map, path);
-  let tmp_map = &mut HashMap::new();
   // Avoid stack overflow by limiting to 200 iterations, feel free to increment this
-  let final_map = recursive_round_handle(&mut 200, tmp_map, map, width, height, 4);
+  let final_map = recursive_round_handle(&mut 200, map, width, height, 4);
   let occupied_seats = count_occupied_seats(final_map);
   return occupied_seats;
 }
 
-pub fn compute2() -> u32 { // part 2 is not accurate
+pub fn compute2() -> u32 {
   let path = "data/11th_day/input.txt";
   let map = &mut HashMap::new();
   let (width, height) = get_map_and_size(map, path);
-  let tmp_map = &mut HashMap::new();
   // Avoid stack overflow by limiting to 200 iterations, feel free to increment this
-  let final_map = recursive_round_handle(&mut 200, tmp_map, map, width, height, 5);
+  let final_map = recursive_round_handle(&mut 200, map, width, height, 5);
   let occupied_seats = count_occupied_seats(final_map);
   return occupied_seats;
 }
@@ -64,14 +63,14 @@ fn count_occupied_seats(map: &HashMap<usize, char>) -> u32 {
   return occupied_seats_count;
 }
 
-fn recursive_round_handle<'a>(count: &mut usize, previous_map: &'a mut HashMap<usize, char>, map: &'a mut HashMap<usize, char>, width: usize, height: usize, number_seat: usize) -> &'a HashMap<usize, char> {
-
+fn recursive_round_handle<'a>(count: &mut usize, map: &'a mut HashMap<usize, char>, width: usize, height: usize, number_seat: usize) -> &'a HashMap<usize, char> {
+  let previous_map: &HashMap<usize, char> = &map.clone();
   for (position, seat) in previous_map.clone() {
     // 4 CORNERS and not a seat
-    if position == 0 
-        || position == width - 1 
+    if position == 0
+        || position == width - 1
         || position == width * (height - 1)
-        || position == width * height - 1 
+        || position == width * height - 1
         || seat == '.' {
       *map.entry(position).or_insert(seat) = seat;
       continue;
@@ -85,10 +84,10 @@ fn recursive_round_handle<'a>(count: &mut usize, previous_map: &'a mut HashMap<u
   
   *count -= 1;
   if count == &mut 0 || previous_map == map {
-    return previous_map;
+    return map;
   }
   // Although it is named previous map, it was updated to be new map. And the map become to be previous map
-  return recursive_round_handle(count, map, previous_map, width, height, number_seat);
+  return recursive_round_handle(count, map, width, height, number_seat);
 }
 
 fn handle_seat(map: &HashMap<usize, char>, position: usize, width: usize, height: usize, number_seat: usize) -> char {
@@ -97,102 +96,56 @@ fn handle_seat(map: &HashMap<usize, char>, position: usize, width: usize, height
 
   // PART 1
   if number_seat == 4 {
-    // TOP
-    if limit_on_top(position, width, height) {
-      list.push(position - 1);
-      list.push(position + 1);
-      list.push(position + width);
-      list.push(position + width - 1);
-      list.push(position + width + 1);
+    if !limit_on_left(position, width, height) {
+      list.push(Movement::West.go(position, width));
     }
-    // BOTTOM
-    else if limit_on_bottom(position, width, height) {
-      list.push(position - 1);
-      list.push(position + 1);
-      list.push(position - width);
-      list.push(position - width - 1);
-      list.push(position - width + 1);
+    if !limit_on_right(position, width, height) {
+      list.push(Movement::East.go(position, width));
     }
-    // LEFT
-    else if limit_on_left(position, width, height) {
-      list.push(position + 1);
-      list.push(position + width);
-      list.push(position + width + 1);
-      list.push(position - width);
-      list.push(position - width + 1);
-    } 
-    // RIGHT
-    else if limit_on_right(position, width, height) {
-      list.push(position - 1);
-      list.push(position + width);
-      list.push(position + width - 1);
-      list.push(position - width);
-      list.push(position - width - 1);
+    if !limit_on_top(position, width, height) {
+      list.push(Movement::North.go(position, width));
     }
-    // any other position
-    else {
-      list.push(position + 1);
-      list.push(position - 1);
-      list.push(position + width);
-      list.push(position + width - 1);
-      list.push(position + width + 1);
-      list.push(position - width);
-      list.push(position - width - 1);
-      list.push(position - width + 1);
+    if !limit_on_bottom(position, width, height) {
+      list.push(Movement::South.go(position, width));
+    }
+    if !(limit_on_top(position, width, height) || limit_on_left(position, width, height)) {
+      list.push(Movement::Northwest.go(position, width));
+    }
+    if !(limit_on_top(position, width, height) || limit_on_right(position, width, height)) {
+      list.push(Movement::Northeast.go(position, width));
+    }
+    if !(limit_on_bottom(position, width, height) || limit_on_left(position, width, height)) {
+      list.push(Movement::Southwest.go(position, width));
+    }
+    if !(limit_on_bottom(position, width, height) || limit_on_right(position, width, height)) {
+      list.push(Movement::Southeast.go(position, width));
     }
   } 
   // PART 2
   else if number_seat == 5 {
-    // TOP
-    if limit_on_top(position, width, height) {
-      list.push(get_next(map, position, width, height, -1));
-      list.push(get_next(map, position, width, height, 1));
-      list.push(get_next(map, position, width, height, width as isize));
-      list.push(get_next(map, position, width, height, (width as isize - 1)));
-      list.push(get_next(map, position, width, height, (width as isize + 1)));
+    if !limit_on_left(position, width, height) {
+      list.push(get_next(map, position, width, height, Movement::West));
     }
-    // BOTTOM
-    else if limit_on_bottom(position, width, height) {
-      list.push(get_next(map, position, width, height, -1));
-      list.push(get_next(map, position, width, height, 1));
-      list.push(get_next(map, position, width, height, - (width as isize)));
-      list.push(get_next(map, position, width, height, - (width as isize - 1)));
-      list.push(get_next(map, position, width, height, - (width as isize + 1)));
+    if !limit_on_right(position, width, height) {
+      list.push(get_next(map, position, width, height, Movement::East));
     }
-    // LEFT
-    else if limit_on_left(position, width, height) {
-      list.push(get_next(map, position, width, height, 1));
-      list.push(get_next(map, position, width, height, width as isize));
-      list.push(get_next(map, position, width, height, (width as isize + 1)));
-      list.push(get_next(map, position, width, height, - (width as isize)));
-      list.push(get_next(map, position, width, height, - (width as isize - 1)));
-    } 
-    // RIGHT
-    else if limit_on_right(position, width, height) {
-      list.push(get_next(map, position, width, height, -1));
-      list.push(get_next(map, position, width, height, width as isize));
-      list.push(get_next(map, position, width, height, (width as isize - 1)));
-      list.push(get_next(map, position, width, height, - (width as isize)));
-      list.push(get_next(map, position, width, height, - (width as isize + 1)));
+    if !limit_on_top(position, width, height) {
+      list.push(get_next(map, position, width, height, Movement::North));
     }
-    // any other position
-    else {
-      let left = get_next(map, position, width, height, -1);
-      let right = get_next(map, position, width, height, 1);
-      let bottom = get_next(map, position, width, height, width as isize);
-      let bottom_left = get_next(map, position, width, height, (width as isize - 1));
-      let bottom_right= get_next(map, position, width, height, (width as isize + 1));
-      let top = get_next(map, position, width, height, - (width as isize));
-      let top_left = get_next(map, position, width, height, - (width as isize - 1));
-      let top_right = get_next(map, position, width, height, - (width as isize + 1));
-      list.push(left);
-      list.push(right);
-      list.push(bottom);
-      list.push(bottom_left);
-      list.push(bottom_right);
-      list.push(top);
-      list.push(top_left);
-      list.push(top_right);
+    if !limit_on_bottom(position, width, height) {
+      list.push(get_next(map, position, width, height, Movement::South));
+    }
+    if !(limit_on_top(position, width, height) || limit_on_left(position, width, height)) {
+      list.push(get_next(map, position, width, height, Movement::Northwest));
+    }
+    if !(limit_on_top(position, width, height) || limit_on_right(position, width, height)) {
+      list.push(get_next(map, position, width, height, Movement::Northeast));
+    }
+    if !(limit_on_bottom(position, width, height) || limit_on_left(position, width, height)) {
+      list.push(get_next(map, position, width, height, Movement::Southwest));
+    }
+    if !(limit_on_bottom(position, width, height) || limit_on_right(position, width, height)) {
+      list.push(get_next(map, position, width, height, Movement::Southeast));
     }
   }
 
@@ -203,24 +156,22 @@ fn handle_seat(map: &HashMap<usize, char>, position: usize, width: usize, height
   }
 }
 
-fn get_next(map: &HashMap<usize, char>, position: usize, width: usize, height: usize, operation: isize) -> usize {
-  let new_position = position as isize + operation;
-
-  if map.contains_key(&(new_position as usize)) {
-    if *map.get(&(new_position as usize)).unwrap() == '.'
-      && !(limit_on_top(new_position as usize, width, height) && operation == (- (width as isize)))
-      && !(limit_on_bottom(new_position as usize, width, height) && operation == (width as isize))
-      && !(limit_on_left(new_position as usize, width, height) && operation == -1)
-      && !(limit_on_right(new_position as usize, width, height) && operation == 1)
-      && !(limit_on_top_left(new_position as usize, width, height) && operation == (- (width as isize - 1)))
-      && !(limit_on_top_right(new_position as usize, width, height)  && operation == (- (width as isize + 1)))
-      && !(limit_on_bottom_left(new_position as usize, width, height) && operation == (width as isize - 1))
-      && !(limit_on_bottom_right(new_position as usize, width, height) && operation == (width as isize + 1)) {
-      return get_next(map, new_position as usize, width, height, operation);
+fn get_next(map: &HashMap<usize, char>, position: usize, width: usize, height: usize, operation: Movement) -> usize {
+  let new_position = operation.go(position, width);
+  if map.contains_key(&(new_position)) {
+    if *map.get(&(new_position)).unwrap() == '.'
+      && !(limit_on_top(new_position, width, height) && operation == Movement::North)
+      && !(limit_on_bottom(new_position, width, height) && operation == Movement::South)
+      && !(limit_on_left(new_position, width, height) && operation == Movement::West)
+      && !(limit_on_right(new_position, width, height) && operation == Movement::East)
+      && !(limit_on_top_left(new_position, width, height) && operation == Movement::Northwest)
+      && !(limit_on_top_right(new_position, width, height)  && operation == Movement::Northeast)
+      && !(limit_on_bottom_left(new_position, width, height) && operation == Movement::Southwest)
+      && !(limit_on_bottom_right(new_position, width, height) && operation == Movement::Southeast) {
+      return get_next(map, new_position, width, height, operation);
     }
-    return new_position as usize;
+    return new_position;
   }
-
   return position;
 }
 
@@ -300,9 +251,8 @@ mod test {
     let path = "data/11th_day/test_input.txt";
     let map = &mut HashMap::new();
     let (width, height) = get_map_and_size(map, path);
-    let tmp_map = &mut HashMap::new();
     // Avoid stack overflow by limiting to 20 iterations, feel free to increment this
-    let final_map = recursive_round_handle(&mut 20, tmp_map, map, width, height, 4);
+    let final_map = recursive_round_handle(&mut 20, map, width, height, 4);
     let occupied_seats = count_occupied_seats(final_map);
     assert_eq!(occupied_seats, 37);
   }
@@ -312,9 +262,8 @@ mod test {
     let path = "data/11th_day/test_input.txt";
     let map = &mut HashMap::new();
     let (width, height) = get_map_and_size(map, path);
-    let tmp_map = &mut HashMap::new();
     // Avoid stack overflow by limiting to 20 iterations, feel free to increment this
-    let final_map = recursive_round_handle(&mut 20, tmp_map, map, width, height, 5);
+    let final_map = recursive_round_handle(&mut 20, map, width, height, 5);
     let occupied_seats = count_occupied_seats(final_map);
     assert_eq!(occupied_seats, 26);
   }
