@@ -55,7 +55,7 @@ fn get_map_and_size(map: &mut HashMap<usize, char>, path: &str) -> (usize, usize
 
 fn count_occupied_seats(map: &HashMap<usize, char>) -> u32 {
   let mut occupied_seats_count: u32 = 0;
-  for (position, seat) in map {
+  for (_position, seat) in map {
     if *seat == '#' {
       occupied_seats_count += 1;
     }
@@ -175,7 +175,7 @@ fn get_next(map: &HashMap<usize, char>, position: usize, width: usize, height: u
   return position;
 }
 
-fn limit_on_top(position: usize, width: usize, height: usize) -> bool {
+fn limit_on_top(position: usize, width: usize, _height: usize) -> bool {
   return position < width;
 }
 
@@ -183,14 +183,13 @@ fn limit_on_bottom(position: usize, width: usize, height: usize) -> bool {
   return position > width * (height - 1);
 }
 
-fn limit_on_left(position: usize, width: usize, height: usize) -> bool {
+fn limit_on_left(position: usize, width: usize, _height: usize) -> bool {
   return position % width == 0;
 }
 
-fn limit_on_right(position: usize, width: usize, height: usize) -> bool {
+fn limit_on_right(position: usize, width: usize, _height: usize) -> bool {
   return position % width == width - 1;
 }
-
 
 fn limit_on_top_left(position: usize, width: usize, height: usize) -> bool {
   return position == 0 || limit_on_top(position, width, height) || limit_on_left(position, width, height);
