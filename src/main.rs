@@ -13,6 +13,7 @@ pub mod aoc_9th_day;
 pub mod aoc_10th_day;
 pub mod aoc_11th_day;
 pub mod aoc_12th_day;
+pub mod aoc_13th_day;
 
 fn main() {
   //first_day();
@@ -26,7 +27,8 @@ fn main() {
   //nineth_day();
   //tenth_day();
   //eleventh_day();
-  twelfth_day();
+  //twelfth_day();
+  thirteenth_day();
 }
 
 #[allow(dead_code)]
@@ -180,5 +182,18 @@ fn twelfth_day() {
   println!(
     "Twelfth day second part value: {:?}",
     aoc_12th_day::rain_risk::compute2()
+  );
+}
+
+#[allow(dead_code)]
+fn thirteenth_day() {
+  println!(
+    "Thirteenth day first part value: {:?}",
+    aoc_13th_day::shuttle_search::compute1()
+  );
+
+  println!(
+    "Thirteenth day second part value: {:?}",
+    aoc_13th_day::shuttle_search::compute2()
   );
 }
