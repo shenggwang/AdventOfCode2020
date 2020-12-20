@@ -9,14 +9,15 @@ use crate::aoc_12th_day::movement::{Action, Movement};
 pub fn compute1() -> u32 {
   let path = "data/12th_day/input.txt";
   let list = get_list(path);
-  let distance = handle_list(list);
+  let distance = handle_list_part1(list);
   return distance;
 }
 
 pub fn compute2() -> u32 {
   let path = "data/12th_day/input.txt";
-  
-  return 2020;
+  let list = get_list(path);
+  let distance = handle_list_part2(list);
+  return distance;
 }
 
 fn get_list(path: &str) -> Vec<Movement> {
@@ -29,7 +30,7 @@ fn get_list(path: &str) -> Vec<Movement> {
   return list;
 }
 
-fn handle_list(list: Vec<Movement>) -> u32 {
+fn handle_list_part1(list: Vec<Movement>) -> u32 {
   let mut initial = (0, 0);
   // direction: 0 or 360 -> right, 90 -> down, 180 -> left, 270 -> top
   let mut direction = 0;
@@ -59,6 +60,35 @@ fn handle_list(list: Vec<Movement>) -> u32 {
   return (initial.0.abs() + initial.1.abs()) as u32;
 }
 
+fn handle_list_part2(list: Vec<Movement>) -> u32 {
+  let mut initial = (0, 0);
+  let mut waypoint = (10, 1);
+  for movement in list {
+    match movement.action {
+      Action::North => waypoint.1 += movement.value,
+      Action::South => waypoint.1 -= movement.value,
+      Action::West => waypoint.0 -= movement.value,
+      Action::East => waypoint.0 += movement.value,
+      Action::Left => waypoint = change_movement(movement.value, waypoint, true),
+      Action::Right => waypoint = change_movement(movement.value, waypoint, false),
+      Action::Forward =>  initial = (initial.0 + (waypoint.0 * movement.value), initial.1 + (waypoint.1 * movement.value)),
+    }
+    //println!("Position {:?}", initial);
+  }
+  return (initial.0.abs() + initial.1.abs()) as u32;
+}
+
+fn change_movement(movement: isize, waypoint: (isize, isize), is_left: bool) -> (isize, isize) {
+  if (movement == 90 && is_left) || (movement == 270 && !is_left) {
+    return (- waypoint.1, waypoint.0);
+  } else if movement == 180 {
+    return (- waypoint.0, - waypoint.1);
+  } else if (movement == 270 && is_left) || (movement == 90 && !is_left) {
+    return (waypoint.1, - waypoint.0);
+  }
+  return waypoint;
+}
+
 #[cfg(test)]
 mod test {
   use super::*;
@@ -67,14 +97,15 @@ mod test {
   fn test_part1() {
     let path = "data/12th_day/test_input.txt";
     let list = get_list(path);
-    let distance = handle_list(list);
+    let distance = handle_list_part1(list);
     assert_eq!(distance, 25);
   }
 
   #[test]
   fn test_part2() {
     let path = "data/12th_day/test_input.txt";
-    
-    //assert_eq!(occupied_seats, 26);
+    let list = get_list(path);
+    let distance = handle_list_part2(list);
+    assert_eq!(distance, 286);
   }
 }
