@@ -14,6 +14,7 @@ pub mod aoc_10th_day;
 pub mod aoc_11th_day;
 pub mod aoc_12th_day;
 pub mod aoc_13th_day;
+pub mod aoc_14th_day;
 
 fn main() {
   //first_day();
@@ -28,7 +29,8 @@ fn main() {
   //tenth_day();
   //eleventh_day();
   //twelfth_day();
-  thirteenth_day();
+  //thirteenth_day();
+  fourteenth_day();
 }
 
 #[allow(dead_code)]
@@ -195,5 +197,18 @@ fn thirteenth_day() {
   println!(
     "Thirteenth day second part value: {:?}",
     aoc_13th_day::shuttle_search::compute2()
+  );
+}
+
+#[allow(dead_code)]
+fn fourteenth_day() {
+  println!(
+    "Fourteenth day first part value: {:?}",
+    aoc_14th_day::docking_data::compute1()
+  );
+
+  println!(
+    "Fourteenth day second part value: {:?}",
+    aoc_14th_day::docking_data::compute2()
   );
 }

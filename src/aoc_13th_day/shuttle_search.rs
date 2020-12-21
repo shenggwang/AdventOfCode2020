@@ -15,9 +15,8 @@ pub fn compute1() -> u32 {
 
 pub fn compute2() -> u64 {
   let path = "data/13th_day/input.txt";
-  let shuttle = get_shuttle_in_string(path);
-  let mut shuttles = shuttle.1;
-  let result = get_ordered_shuttle(shuttle.0, &mut shuttles) as u64;
+  let mut shuttle = get_shuttle_in_string(path);
+  let result = get_ordered_shuttle(&mut shuttle) as u64;
   return result;
 }
 
@@ -36,7 +35,7 @@ fn get_shuttle(path: &str) -> (usize, Vec<usize>) {
   return (content[0].parse().unwrap(), times);
 }
 
-fn get_shuttle_in_string(path: &str) -> (usize, Vec<(usize, usize)>) {
+fn get_shuttle_in_string(path: &str) -> Vec<(usize, usize)> {
   let buffer: BufReader<File> = get_buffer_file(path);
   let mut content = vec![];
 
@@ -58,7 +57,7 @@ fn get_shuttle_in_string(path: &str) -> (usize, Vec<(usize, usize)>) {
                 })
                 .filter(|x| x != &(0_usize, 0_usize))
                 .collect();
-  return (content[0].parse().unwrap(), tuples);
+  return tuples;
 }
 
 fn get_earliest_shuttle(timestamp: usize, shuttles: Vec<usize>) -> usize {
@@ -76,7 +75,7 @@ fn get_earliest_shuttle(timestamp: usize, shuttles: Vec<usize>) -> usize {
 
 // This is a brute-force solutions, this doesn't work as solution.
 // After google it, it was suggested 'the chinese remainder theorem'.
-fn get_ordered_shuttle(timestamp: usize, tuples: &mut Vec<(usize, usize)>) -> usize {
+fn get_ordered_shuttle(tuples: &mut Vec<(usize, usize)>) -> usize {
 
   let mut timestamp = 0;
   let mut inc = tuples[0].0;
@@ -106,9 +105,8 @@ mod test {
   #[test]
   fn test_part2() {
     let path = "data/13th_day/test_input.txt";
-    let shuttle = get_shuttle_in_string(path);
-    let mut shuttles = shuttle.1;
-    let result = get_ordered_shuttle(shuttle.0, &mut shuttles) as u64;
+    let mut shuttle = get_shuttle_in_string(path);
+    let result = get_ordered_shuttle(&mut shuttle) as u64;
     assert_eq!(result, 1068781);
   }
 }
