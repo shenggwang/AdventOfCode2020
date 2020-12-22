@@ -15,10 +15,10 @@ pub fn compute1() -> usize {
   return result;
 }
 
-pub fn compute2() -> u64 {
+pub fn compute2() -> usize {
   let path = "data/14th_day/input.txt";
   let program = get_program(path);
-  let result = 2020;
+  let result = handle_program_memory(program);
   return result;
 }
 
@@ -51,8 +51,8 @@ fn handle_program(programs: Vec<Program>) -> usize {
   let mut map = HashMap::new();
   //println!("programs {:?}", programs);
   for program in programs {
-    for (address, decimal) in program.clone().memory {
-      map.insert(address, get_result(decimal, program.clone().mask));
+    for (address, decimal) in &program.memory {
+      map.insert(*address, get_result(*decimal, &program.mask));
     }
   }
   //println!("map: {:?}", map);
@@ -63,8 +63,8 @@ fn handle_program(programs: Vec<Program>) -> usize {
   return value;
 }
 
-fn get_result(value: usize, mask: Vec<char>) -> usize {
-  let binary = format!("{:036b}", value);
+fn get_result(value: usize, mask: &Vec<char>) -> usize {
+  let binary = Program::convert_to_binary(value);
   //println!("binary before: {:?}", result);
   let result = binary.chars()
     .enumerate()
@@ -77,10 +77,63 @@ fn get_result(value: usize, mask: Vec<char>) -> usize {
     })
     .collect::<String>();
   
-  //println!("binary after: {:?}", result);
-  let result_int = usize::from_str_radix(result.as_str(), 2).unwrap();
-  //println!("result: {}", result_int);
-  return result_int;
+  return Program::convert_to_usize(result.as_str());
+}
+
+fn handle_program_memory(programs: Vec<Program>) -> usize {
+  let mut map = HashMap::new();
+  //println!("programs {:?}", programs);
+  for program in programs {
+    for (address, decimal) in &program.memory {
+      let floating_values = get_floating(*address, &program.mask);
+      //println!("floating: {:?}", floating_values);
+      handle_floating(&mut map, floating_values, *decimal);
+    }
+  }
+  //println!("map: {:?}", map);
+  let mut value = 0;
+  for (_address, decimal) in &map {
+    value += decimal;
+  }
+  return value;
+}
+
+fn get_floating(value: usize, mask: &Vec<char>) -> String {
+  let binary = format!("{:036b}", value);
+  //println!("binary before: {:?}", binary);
+  let result = binary.chars()
+    .enumerate()
+    .map(|(i, x)| -> char {
+      //println!("value: {:?}, mask: {:?} at {:?}", result, mask[i], i);
+      if mask[i] == 'X' || mask[i] == '1' {
+        return mask[i];
+      }
+      return x;
+    })
+    .collect::<String>();
+  //println!("binary with floating: {:?}", result);
+  return result;
+}
+
+fn handle_floating(map: &mut HashMap<usize, usize>, floating: String, value: usize) -> () {
+  let list = Program::get_all_combinations(floating.clone());
+  //println!("all combination: {:?}", list);
+
+  for element in list {
+    let mut index = 0;
+    let address = floating.chars()
+      .map(|x| {
+        if x == 'X' {
+          index += 1;
+          return element.chars().nth(index - 1).unwrap();
+        } 
+        return x;
+      })
+      .collect::<String>();
+    let converted_address = Program::convert_to_usize(address.as_str());
+    //println!("address: {}, addressed converted {:?}", address, converted_address);
+    *map.entry(converted_address).or_insert(0) = value;
+  }
 }
 
 #[cfg(test)]
@@ -97,8 +150,9 @@ mod test {
 
   #[test]
   fn test_part2() {
-    let path = "data/14th_day/test_input.txt";
+    let path = "data/14th_day/test2_input.txt";
     let program = get_program(path);
-    assert_eq!(5, 1068781);
+    let result = handle_program_memory(program);
+    assert_eq!(result, 208);
   }
 }
