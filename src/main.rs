@@ -16,6 +16,7 @@ pub mod aoc_12th_day;
 pub mod aoc_13th_day;
 pub mod aoc_14th_day;
 pub mod aoc_15th_day;
+pub mod aoc_16th_day;
 
 fn main() {
   //first_day();
@@ -32,7 +33,8 @@ fn main() {
   //twelfth_day();
   //thirteenth_day();
   //fourteenth_day();
-  fifteenth_day();
+  //fifteenth_day();
+  sixteenth_day();
 }
 
 #[allow(dead_code)]
@@ -225,5 +227,18 @@ fn fifteenth_day() {
   println!(
     "Fifteenth day second part value: {:?}",
     aoc_15th_day::rambunctious_recitation::compute2()
+  );
+}
+
+#[allow(dead_code)]
+fn sixteenth_day() {
+  println!(
+    "Sixteenth day first part value: {:?}",
+    aoc_16th_day::ticket_translation::compute1()
+  );
+
+  println!(
+    "Sixteenth day second part value: {:?}",
+    aoc_16th_day::ticket_translation::compute2()
   );
 }
