@@ -17,7 +17,7 @@ pub mod aoc_13th_day;
 pub mod aoc_14th_day;
 pub mod aoc_15th_day;
 pub mod aoc_16th_day;
-//pub mod aoc_17th_day;
+pub mod aoc_17th_day;
 pub mod aoc_18th_day;
 
 fn main() {
@@ -36,8 +36,8 @@ fn main() {
   //thirteenth_day();
   //fourteenth_day();
   //fifteenth_day();
-  sixteenth_day();
-  //seventeenth_day();
+  //sixteenth_day();
+  seventeenth_day();
   //eighteenth_day();
 }
 
@@ -247,30 +247,28 @@ fn sixteenth_day() {
   );
 }
 
-/*
 #[allow(dead_code)]
 fn seventeenth_day() {
   println!(
-    "Sixteenth day first part value: {:?}",
-    aoc_17th_day::ticket_translation::compute1()
+    "Seventeenth day first part value: {:?}",
+    aoc_17th_day::conwey_cube::compute1()
   );
 
   println!(
-    "Sixteenth day second part value: {:?}",
-    aoc_17th_day::ticket_translation::compute2()
+    "Seventeenth day second part value: {:?}",
+    aoc_17th_day::conwey_cube::compute2()
   );
 }
-*/
 
 #[allow(dead_code)]
 fn eighteenth_day() {
   println!(
-    "Sixteenth day first part value: {:?}",
+    "Eighteenth day first part value: {:?}",
     aoc_18th_day::operation_order::compute1()
   );
 
   println!(
-    "Sixteenth day second part value: {:?}",
+    "Eighteenth day second part value: {:?}",
     aoc_18th_day::operation_order::compute2()
   );
 }
