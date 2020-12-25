@@ -22,12 +22,8 @@ pub fn compute2() -> u64 {
 
 fn get_input(path: &str) -> String {
   let buffer: BufReader<File> = get_buffer_file(path);
-  let mut text: String = "".to_string();
-  for line in buffer.lines() {
-    text = line.expect("Unable to read line.").parse().unwrap();
-
-  }
-  return text;
+  let single_line: String = buffer.lines().take(1).map(|x| x.expect("Unable to read line.")).collect();
+  return single_line;
 }
 
 fn number_at_give_value(input: String, index: usize) -> usize {
