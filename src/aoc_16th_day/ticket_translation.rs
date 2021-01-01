@@ -16,12 +16,15 @@ pub fn compute1() -> u64 {
 pub fn compute2() -> u64 {
   let path = "data/16th_day/input.txt";
   let mut ticket = get_ticket(path);
+  let my_ticket = ticket.ticket[0].split(",").map(|x| x.parse().unwrap()).collect::<Vec<usize>>();
   let map = ticket.get_rules_with_name();
-  let vec = Ticket::get_index_of(&map, "departure");
-  //println!("map: {:?}", map);
-  println!("vec: {:?}", vec);
-  //println!("value: {:?}", ticket.get_value(vec));
-  return 2020;
+  let list = ticket.get_list_of_rules_name_by_substring("departure");
+  let mut value = 1;
+  //println!("map: {:?}, list:{:?}", map, list);
+  for rule_name in list {
+    value *= my_ticket[Ticket::get_index_of(&map, rule_name.as_str())];
+  }
+  return value as u64;
 }
 
 fn get_ticket(path: &str) -> Ticket {
@@ -68,8 +71,8 @@ mod test {
     let vec_class = Ticket::get_index_of(&map, "class");
     let vec_row = Ticket::get_index_of(&map, "row");
     let vec_seat = Ticket::get_index_of(&map, "seat");
-    assert_eq!(1, vec_class[0]);
-    assert_eq!(0, vec_row[0]);
-    assert_eq!(2, vec_seat[0]);
+    assert_eq!(1, vec_class);
+    assert_eq!(0, vec_row);
+    assert_eq!(2, vec_seat);
   }
 }

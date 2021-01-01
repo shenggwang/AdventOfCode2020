@@ -1,6 +1,5 @@
 use std::{
   fmt::Debug,
-  hash::Hash,
   collections::HashMap
 };
 use regex::Regex;
@@ -67,66 +66,83 @@ impl Ticket {
     return result;
   }
 
-  pub fn get_rules_with_name(&mut self) -> HashMap<usize, String> {
+  pub fn get_rules_with_name(&mut self) -> HashMap<String, usize> {
     let mut map = HashMap::new();
-    // TODO give rule to ticket number
-    // 1 - get first rule
-    // 2 - get index that all the nearby_rules fit
-    // 3 - save the index as key and corresponding String as value
-    // 4 - get second rule
-    // 5 - get index that all the nearby_rules fit
-    // 6 - if there is one already fit then move on
-    // 7 - if there is no more that fit it then put it to that one and go nack to that one and iterate it
 
     let rules = &self.rules;
+    let my_ticket= &self.ticket.clone()[0];
     let nearby_tickets = &self.nearby_tickets;
+
+    // Gets the size of first ticket. (note: all tickets has same size)
+    let ticket_size = my_ticket.split(",").count();
+    let my_ticket = my_ticket.split(",").map(|x| x.parse().unwrap()).collect::<Vec<usize>>();
     for index in 0..rules.len() {
       let tuple = &rules[index];
-      // Gets the size of first ticket. (note: all tickets has same size)
-      let ticket_size = nearby_tickets[0].split(",").count();
       for i in 0..ticket_size {
-        if map.contains_key(&i) {
-            // TODO if one there is already one that fits here
-            
-            continue;
-        }
         let value = nearby_tickets.clone()
           .iter()
-          .filter(|x| x
-            .split(",")
-            .nth(i)
-            .filter(|x| self.is_within(x.parse().unwrap(), tuple.1.as_str()) 
-              || self.is_within(x.parse().unwrap(), tuple.2.as_str()))
-            .is_some()
-          )
+          .filter(|x| {
+            let number = x.split(",")
+              .nth(i).unwrap();
+            let condition = self.is_between_two_rules(number.parse().unwrap(), tuple.1.as_str(), tuple.2.as_str());
+            return !condition;
+          })
           .count();
-        if value == nearby_tickets.len() {
-          map.insert(i, tuple.0.to_string());
-          break;
+        // check if it also works for my ticket
+        let condition = self.is_between_two_rules(my_ticket[i], tuple.1.as_str(), tuple.2.as_str());
+        if value == nearby_tickets.len() && !condition {
+          map.entry(i).or_insert(vec![]).push(tuple.0.to_string());
         }
       }
     }
-    return map;
+    let mut output_map = HashMap::new();
+    return Ticket::select_correct_one(&mut map, &mut output_map);
   }
 
-  pub fn get_value(&self, list: Vec<usize>) -> usize {
-    let vec: Vec<usize> = self.ticket[0].split(",").map(|x| x.parse().unwrap()).collect();
-    let mut value = 0;
-    for index in list.iter() {
-      //value += vec[index];
-    }
-    return value;
-  }
-
-  pub fn get_index_of(map: &HashMap<usize, String>, rule_name: &str) -> Vec<usize> {
+  pub fn get_list_of_rules_name_by_substring(self, rule_name: &str) -> Vec<String> {
     let mut vec = vec![];
-    for (k, v) in map.iter() {
-      //println!("key: {:?}, value: {:?}", *k, *v);
-      if v.contains(rule_name) {
-        vec.push(*k);
+    let rules = &self.rules.clone();
+    for tuple in rules {
+      let name = &tuple.0;
+      if name.contains(rule_name) {
+        vec.push(name.clone());
       }
     }
     return vec;
+  }
+
+  pub fn get_index_of(map: &HashMap<String, usize>, rule_name: &str) -> usize {
+
+    return *map.get(rule_name).unwrap();
+  }
+
+  fn select_correct_one(map: &mut HashMap<usize, Vec<String>>, output_map: &mut HashMap<String, usize>) -> HashMap<String, usize> {
+
+    for (rule_name, number) in output_map.iter() {
+      if map.contains_key(number) {
+        let value = map.entry(*number).or_insert(vec![]);
+        if value.len() == 1 {
+          map.remove(number);
+        }
+        for (_, list_rule_name) in map.iter_mut() {
+          let index = list_rule_name.iter().position(|x| *x == *rule_name).unwrap();
+          list_rule_name.remove(index);
+          //println!("index: {:?}, list: {:?}", index, list_rule_name);
+        }
+      }
+    }
+
+    if map.len() == 0 {
+      return output_map.clone();
+    }
+
+    for (number, list_rule_name) in map.iter() {
+      if list_rule_name.len() == 1 {
+        let rule_name = list_rule_name[0].clone();
+        output_map.insert(rule_name, *number);
+      }
+    }
+    return Ticket::select_correct_one(map, output_map);
   }
 
   fn parse_rules(rule_line: String) -> (String, String, String) {
@@ -141,12 +157,17 @@ impl Ticket {
     (rule_name[0].to_string(), first_part.to_string(), second_part[1].to_string())
   }
 
-  fn is_within(&self, number: usize, part: &str) -> bool {
-    let rule: Vec<usize> = part
+  fn is_between_two_rules(&self, number: usize, first_rule: &str, second_rule: &str) -> bool {
+    let rule_1: Vec<usize> = first_rule
       .split("-")
       .map(|x| x.parse().unwrap())
       .collect();
-    if rule[0] <= number && rule[1] >= number {
+    let rule_2: Vec<usize> = second_rule
+      .split("-")
+      .map(|x| x.parse().unwrap())
+      .collect();
+
+    if number > rule_1[1] && number < rule_2[0]{
       return true;
     }
     return false;
