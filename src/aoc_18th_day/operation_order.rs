@@ -1,126 +1,192 @@
 use std::{
   io::{BufReader, BufRead},
-  fs::File,
-  collections::HashMap
+  fs::File
 };
 
 use crate::tools::file_handler::get_buffer_file;
 
 pub fn compute1() -> u64 {
-  let path = "data/15th_day/input.txt";
-  let input = get_calculate(path);
-  let result = 2020;
+  let path = "data/18th_day/input.txt";
+  let result = get_calculate(path, calculate);
   return result as u64;
 }
 
 pub fn compute2() -> u64 {
-  let path = "data/15th_day/input.txt";
-  let input = get_calculate(path);
-  let result = 2020;
+  let path = "data/18th_day/input.txt";
+  let result = get_calculate(path, advanced_calculate);
   return result as u64;
 }
 
-fn get_calculate(path: &str) -> usize {
+fn get_calculate(path: &str, f: fn(Vec<String>) -> usize) -> usize {
   let buffer: BufReader<File> = get_buffer_file(path);
   let mut value = 0;
   for line in buffer.lines() {
     let text: String = line.expect("Unable to read line.").parse().unwrap();
-    value += calculate(text.as_str());
+    value += f(build_input(text.as_str()));
   }
   return value;
 }
 
-/*
-fn calculate(line: &str) -> usize {
-  let list: Vec<char> = line.chars().filter(|x| *x != ' ').collect();
+fn calculate(list: Vec<String>) -> usize {
   let mut stack = vec![];
-  let mut result = vec![];
+  let mut number = 0;
+  let mut result = 0;
+  // 0 = null; 1 = '+'; 2 = '*'
+  let mut operation = 0;
   for index in 0..list.len() {
-    let character = list[index];
-    match character {
-      '(' => {
-        stack.push(character);
-      },
-      ')' => {
-        while let Some(t) = stack.pop() {
-          if t == '(' {
-            break
-          } else {
-            result.push(t);
-          }
+    let character = list[index].as_str();
+    if character.chars().all(char::is_numeric) {
+      number = character.parse().unwrap();
+      if result == 0 {
+        result = number;
+      } 
+      if operation != 0 {
+        if operation == 1 {
+          result += number;
+        } else if operation == 2 {
+          result *= number;
         }
-      },
-      '*' | '+' => {
-        while let Some(t) = stack.last() {
-          if *t == '+' || *t == '*' {
-            result.push(*t);
-            stack.pop();
-          } else {
-              break;
-          }
+      }
+    } else if character == "+" {
+      operation = 1;
+    } else if character == "*" {
+      operation = 2;
+    } else if character == "(" {
+      stack.push(result);
+      stack.push(operation);
+      result = 0;
+      operation = 0;
+    } else if character == ")" {
+      let store_operation = stack.pop().unwrap();
+      let store_number = stack.pop().unwrap();
+      if store_operation != 0 {
+        if store_operation == 1 {
+          result += store_number;
+        } else if store_operation == 2 {
+          result *= store_number;
         }
-        stack.push(character);
-      },
-      _ => result.push(character),
+      }
     }
   }
-  while let Some(t) = stack.pop() {
-    result.push(t);
+  return result;
+}
+
+
+fn advanced_calculate(list: Vec<String>) -> usize {
+
+  let mut new_list = sum_operation_first(list);
+  let mut timeout = 0;
+  while timeout < 100 {
+    if new_list.iter().any(|x| x == "+") {
+      //println!("list before: {:?}", new_list);
+      new_list = sum_operation_first(new_list);
+      //println!("sum - list after: {:?}", new_list);
+      if new_list.len() != 1 {
+        new_list = handle_values_within_parantheses(new_list);
+        //println!("handle - list after: {:?}", new_list);
+      }
+    } else {
+      return calculate(new_list);
+    }
+    timeout += 1;
   }
-  // '1'.to_digit(10).unwrap() as usize
-  println!("debug: {:?}", result);
   return 2020;
 }
-*/
 
-fn calculate(line: &str) -> usize {
-  let list: Vec<char> = line.chars().filter(|x| *x != ' ').collect();
-  let mut previous_number = vec![];
-  let mut previous_index = 0;
-  let mut previous_operator = ' ';
-  let mut all_operator = vec![];
-  for index in 0..list.len() {
-    let character = list[index];
-    match character {
-      '(' => {
-        if index > 0 && list[index - 1] != '(' {
-          all_operator.push(list[index - 1]);
-        } else {
-          previous_index += 1;  // TODO use push and pop
-          previous_number.push(0);
+fn sum_operation_first(list: Vec<String>) -> Vec<String> {
+  let mut new_list = vec![];
+  let mut number = 0;
+  let mut is_sum = false;
+  let sum_operator = "+";
+  let mul_operator = "*";
+
+  let list_size = list.len();
+
+  for index in 0..list_size {
+    let character = list[index].as_str();
+    if character.chars().all(char::is_numeric) {
+      // if: not + n +;
+      if index != 0 && index != list_size - 1 && list[index - 1] != sum_operator && list[index + 1] != sum_operator {
+        new_list.push(character.to_string());
+        number = 0;
+      // if: + 1
+      } else if index != 0 && list[index - 1] == sum_operator && number != 0 {
+        number = number + character.parse::<i32>().unwrap();
+        if index == list_size - 1 || (index != list_size - 1 && list[index + 1] != sum_operator) {
+          new_list.push(number.to_string());
+          number = 0;
         }
-      },
-      ')' => {
-        if index < list.len() - 1 && list[index + 1] != ')' {
-          all_operator.push(list[index + 1]);
-        } else {
-          previous_index += 1;
-          previous_number.push(0);
+      // if: n +
+      } else if index != list_size - 1 && list[index + 1] == sum_operator {
+        number += character.parse::<i32>().unwrap();
+      } else if index == 0 && list[index + 1] != sum_operator {
+        new_list.push(character.to_string());
+      }
+    } else if character == sum_operator {
+      if index != list_size - 1 && !list[index + 1].chars().all(char::is_numeric) {
+        if number != 0 {
+          new_list.push(number.to_string());
+          number = 0;
         }
-      },
-      '*' | '+' => {
-        previous_operator = character
-      },
-      _ => {
-        println!("index: {} value: {}, previous number {:?}, previous_index {}", index, character, previous_number, previous_index);
-        let length = previous_number.len();
-        if length == 0 {
-          previous_number.push(character.to_digit(10).unwrap() as usize);
-        } else if previous_number[length - 1] == 0 {
-          previous_number[length - 1] = character.to_digit(10).unwrap() as usize;
-        } else {
-          if previous_operator == '+' {
-            previous_number[previous_index] += character.to_digit(10).unwrap() as usize;
-          } else {
-            previous_number[previous_index] *= character.to_digit(10).unwrap() as usize;
-          }
-        }
-      },
+        new_list.push(character.to_string());
+      }
+    } else {
+      new_list.push(character.to_string());
     }
+    //println!("Number: {:?}, character: {:?}, list: {:?}", number, character, new_list);
   }
-  println!("numbers: {:?}", previous_number);
-  println!("operators: {:?}", all_operator);
-  return 2020;
+  return new_list;
+}
+
+fn handle_values_within_parantheses(list: Vec<String>) -> Vec<String> {
+  let mut new_list: Vec<String> = vec![];
+  let mut within_parantheses = vec![];
+  let start_parentheses = "(";
+  let end_parentheses = ")";
+  let sum_operator = "+";
+  let mul_operator = "*";
+  let list_size = list.len();
+
+  for index in 0..list_size {
+    let character = list[index].as_str();
+    let within_parantheses_size = within_parantheses.len();
+    if character.chars().all(char::is_numeric) || character == sum_operator || character == mul_operator {
+      if within_parantheses_size != 0 {
+        within_parantheses.push(character.to_string());
+      } else {
+        new_list.push(character.to_string());
+      }
+    } else if character == start_parentheses {
+      if within_parantheses_size == 0 {
+        within_parantheses.push(character.to_string());
+      } else {
+        for value in within_parantheses {
+          new_list.push(value);
+        }
+        within_parantheses = vec![start_parentheses.to_string()];
+      }
+    } else if character == end_parentheses {
+      if within_parantheses_size == 0 {
+        new_list.push(character.to_string());
+      } else if !within_parantheses.contains(&sum_operator.to_string()) {
+        let vec = within_parantheses.clone();
+        let value = calculate(vec);
+        new_list.push(value.to_string());
+        within_parantheses = vec![];
+      } else {
+        for value in &within_parantheses {
+          new_list.push(value.to_string());
+        }
+        new_list.push(character.to_string());
+      }
+    }
+    //println!("Within parentheses: {:?}, character: {:?}, list: {:?}", within_parantheses, character, new_list);
+  }
+  return new_list;
+}
+
+fn build_input(line: &str) -> Vec<String> {
+  return line.chars().filter(|x| *x != ' ').map(|x| x.to_string()).collect();
 }
 
 #[cfg(test)]
@@ -129,51 +195,47 @@ mod test {
 
   #[test]
   fn test_part1() {
-    /*
-    let test_input1 = "1 + 2 * 3 + 4 * 5 + 6";
+    
+    let test_input1 = build_input("1 + 2 * 3 + 4 * 5 + 6");
     assert_eq!(calculate(test_input1), 71);
 
-    let test_input2 = "1 + (2 * 3) + (4 * (5 + 6))";
+    let test_input2 = build_input("1 + (2 * 3) + (4 * (5 + 6))");
     assert_eq!(calculate(test_input2), 51);
 
-    let test_input3 = "2 * 3 + (4 * 5)";
+    let test_input3 = build_input("2 * 3 + (4 * 5)");
     assert_eq!(calculate(test_input3), 26);
 
-    let test_input4 = "5 + (8 * 3 + 9 + 3 * 4 * 3)";
+    let test_input4 = build_input("5 + (8 * 3 + 9 + 3 * 4 * 3)");
     assert_eq!(calculate(test_input4), 437);
 
-    let test_input5 = "5 * 9 * (7 * 3 * 3 + 9 * 3 + (8 + 6 * 4))";
+    let test_input5 = build_input("5 * 9 * (7 * 3 * 3 + 9 * 3 + (8 + 6 * 4))");
     assert_eq!(calculate(test_input5), 12240);
 
-    let test_input6 = "((2 + 4 * 9) * (6 + 9 * 8 + 6) + 6) + 2 + 4 * 2";
+    let test_input6 = build_input("((2 + 4 * 9) * (6 + 9 * 8 + 6) + 6) + 2 + 4 * 2");
     assert_eq!(calculate(test_input6), 13632);
-    */
 
   }
 
   #[test]
   fn test_part2() {
-    /* TODO
-    let test_input1 = "0,3,6".to_string();
-    assert_eq!(number_at_give_value(test_input1, 30000000), 175594);
+    /*
+    let test_input1 = build_input("1 + 2 * 3 + 4 * 5 + 6");
+    assert_eq!(advanced_calculate(test_input1), 231);
 
-    let test_input2 = "1,3,2".to_string();
-    assert_eq!(number_at_give_value(test_input2, 30000000), 2578);
-
-    let test_input3 = "2,1,3".to_string();
-    assert_eq!(number_at_give_value(test_input3, 30000000), 3544142);
-
-    let test_input4 = "1,2,3".to_string();
-    assert_eq!(number_at_give_value(test_input4, 30000000), 261214);
-
-    let test_input5 = "2,3,1".to_string();
-    assert_eq!(number_at_give_value(test_input5, 30000000), 6895259);
-
-    let test_input6 = "3,2,1".to_string();
-    assert_eq!(number_at_give_value(test_input6, 30000000), 18);
+    let test_input2 = build_input("1 + (2 * 3) + (4 * (5 + 6))");
+    assert_eq!(advanced_calculate(test_input2), 51);
     
-    let test_input7 = "3,1,2".to_string();
-    assert_eq!(number_at_give_value(test_input7, 30000000), 362);
+    let test_input3 = build_input("2 * 3 + (4 * 5)");
+    assert_eq!(advanced_calculate(test_input3), 46);
+
+    let test_input4 = build_input("5 + (8 * 3 + 9 + 3 * 4 * 3)");
+    assert_eq!(advanced_calculate(test_input4), 1445);
+
+    let test_input5 = build_input("5 * 9 * (7 * 3 * 3 + 9 * 3 + (8 + 6 * 4))");
+    assert_eq!(advanced_calculate(test_input5), 669060);
     */
+    let test_input6 = build_input("((2 + 4 * 9) * (6 + 9 * 8 + 6) + 6) + 2 + 4 * 2");
+    assert_eq!(advanced_calculate(test_input6), 23340);
+
   }
 }
