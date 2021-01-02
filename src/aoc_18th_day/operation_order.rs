@@ -29,14 +29,13 @@ fn get_calculate(path: &str, f: fn(Vec<String>) -> usize) -> usize {
 
 fn calculate(list: Vec<String>) -> usize {
   let mut stack = vec![];
-  let mut number = 0;
   let mut result = 0;
   // 0 = null; 1 = '+'; 2 = '*'
   let mut operation = 0;
   for index in 0..list.len() {
     let character = list[index].as_str();
     if character.chars().all(char::is_numeric) {
-      number = character.parse().unwrap();
+      let number = character.parse().unwrap();
       if result == 0 {
         result = number;
       } 
@@ -78,12 +77,12 @@ fn advanced_calculate(list: Vec<String>) -> usize {
   let mut timeout = 0;
   while timeout < 100 {
     if new_list.iter().any(|x| x == "+") {
-      //println!("list before: {:?}", new_list);
+      //println!("list: {:?}", new_list);
       new_list = sum_operation_first(new_list);
-      //println!("sum - list after: {:?}", new_list);
+      //println!("sum - list after sum operation: {:?}", new_list);
       if new_list.len() != 1 {
         new_list = handle_values_within_parantheses(new_list);
-        //println!("handle - list after: {:?}", new_list);
+        //println!("handle - list after handling within parentheses: {:?}", new_list);
       }
     } else {
       return calculate(new_list);
@@ -96,9 +95,8 @@ fn advanced_calculate(list: Vec<String>) -> usize {
 fn sum_operation_first(list: Vec<String>) -> Vec<String> {
   let mut new_list = vec![];
   let mut number = 0;
-  let mut is_sum = false;
   let sum_operator = "+";
-  let mul_operator = "*";
+  let end_parentheses = ")";
 
   let list_size = list.len();
 
@@ -109,18 +107,35 @@ fn sum_operation_first(list: Vec<String>) -> Vec<String> {
       if index != 0 && index != list_size - 1 && list[index - 1] != sum_operator && list[index + 1] != sum_operator {
         new_list.push(character.to_string());
         number = 0;
-      // if: + 1
-      } else if index != 0 && list[index - 1] == sum_operator && number != 0 {
-        number = number + character.parse::<i32>().unwrap();
-        if index == list_size - 1 || (index != list_size - 1 && list[index + 1] != sum_operator) {
+      // if: first element
+      } else if index == 0 && list[index + 1] != sum_operator {
+        new_list.push(character.to_string());
+      // if last element
+      } else if index == list_size - 1 {
+        if list[index - 1] != sum_operator {
+          new_list.push(character.to_string());
+        } else {
+          number += character.parse::<i32>().unwrap();
           new_list.push(number.to_string());
           number = 0;
+        }
+      // if: + 1
+      } else if index != 0 && list[index - 1] == sum_operator {
+        if number != 0 {
+          number = number + character.parse::<i32>().unwrap();
+          // if last element after operator +
+          if index == list_size - 1 || (index != list_size - 1 && list[index + 1] != sum_operator) {
+            new_list.push(number.to_string());
+            number = 0;
+          }
+        } else if number == 0 && index != list_size - 1 && list[index + 1] != sum_operator {
+          new_list.push(character.to_string());
+        } else {
+          number = number + character.parse::<i32>().unwrap();
         }
       // if: n +
       } else if index != list_size - 1 && list[index + 1] == sum_operator {
         number += character.parse::<i32>().unwrap();
-      } else if index == 0 && list[index + 1] != sum_operator {
-        new_list.push(character.to_string());
       }
     } else if character == sum_operator {
       if index != list_size - 1 && !list[index + 1].chars().all(char::is_numeric) {
@@ -128,6 +143,8 @@ fn sum_operation_first(list: Vec<String>) -> Vec<String> {
           new_list.push(number.to_string());
           number = 0;
         }
+        new_list.push(character.to_string());
+      } else if index != 0 && list[index - 1] == end_parentheses {
         new_list.push(character.to_string());
       }
     } else {
@@ -218,7 +235,7 @@ mod test {
 
   #[test]
   fn test_part2() {
-    /*
+    
     let test_input1 = build_input("1 + 2 * 3 + 4 * 5 + 6");
     assert_eq!(advanced_calculate(test_input1), 231);
 
@@ -233,7 +250,7 @@ mod test {
 
     let test_input5 = build_input("5 * 9 * (7 * 3 * 3 + 9 * 3 + (8 + 6 * 4))");
     assert_eq!(advanced_calculate(test_input5), 669060);
-    */
+    
     let test_input6 = build_input("((2 + 4 * 9) * (6 + 9 * 8 + 6) + 6) + 2 + 4 * 2");
     assert_eq!(advanced_calculate(test_input6), 23340);
 
