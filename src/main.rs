@@ -19,6 +19,7 @@ pub mod aoc_15th_day;
 pub mod aoc_16th_day;
 pub mod aoc_17th_day;
 pub mod aoc_18th_day;
+pub mod aoc_19th_day;
 
 fn main() {
   //first_day();
@@ -38,7 +39,8 @@ fn main() {
   //fifteenth_day();
   //sixteenth_day();
   //seventeenth_day();
-  eighteenth_day();
+  //eighteenth_day();
+  nineteenth_day();
 }
 
 #[allow(dead_code)]
@@ -270,5 +272,18 @@ fn eighteenth_day() {
   println!(
     "Eighteenth day second part value: {:?}",
     aoc_18th_day::operation_order::compute2()
+  );
+}
+
+#[allow(dead_code)]
+fn nineteenth_day() {
+  println!(
+    "Nineteenth day first part value: {:?}",
+    aoc_19th_day::monster_messages::compute1()
+  );
+
+  println!(
+    "Nineteenth day second part value: {:?}",
+    aoc_19th_day::monster_messages::compute2()
   );
 }
