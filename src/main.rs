@@ -277,11 +277,12 @@ fn eighteenth_day() {
 
 #[allow(dead_code)]
 fn nineteenth_day() {
+  /*
   println!(
     "Nineteenth day first part value: {:?}",
     aoc_19th_day::monster_messages::compute1()
   );
-
+  */
   println!(
     "Nineteenth day second part value: {:?}",
     aoc_19th_day::monster_messages::compute2()
