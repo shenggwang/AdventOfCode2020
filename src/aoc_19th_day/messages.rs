@@ -2,9 +2,7 @@ use std::{
   fmt::Debug,
   collections::{HashSet, HashMap},
   iter::FromIterator,
-  sync::mpsc::channel
 };
-use threadpool::ThreadPool;
 use regex::Regex;
 
 #[derive(PartialEq, Eq, Clone, Debug)]
@@ -33,51 +31,52 @@ impl Messages {
     self.received_messages.push(received_message);
   }
 
-  pub fn get_first_deciphered_message(deciphered_messages: HashMap<usize, String>) -> Vec<String> {
-    let value = deciphered_messages.get(&0).unwrap().to_string();
-    let cloned_deciphered_messages = deciphered_messages.clone();
+  pub fn get_first_deciphered_message(&mut self) -> Vec<String> {
+    let value = self.valid_messages.get(&0).unwrap().to_string();
     
-    let mut list_valid_messages: Vec<String> = Messages::decipher_string_to_list(&cloned_deciphered_messages, value);
+    let mut list_valid_messages: Vec<String> = self.decipher_string_to_list(value);
     let re = Regex::new(r"\d").unwrap();
     loop {
       let flag = list_valid_messages.iter().any(|x| re.is_match(x));
       if !flag {
         return list_valid_messages;
       }
-      list_valid_messages = Messages::decipher_list_to_list(&cloned_deciphered_messages, list_valid_messages);
+      list_valid_messages = self.decipher_list_to_list(list_valid_messages);
     }
   }
 
   pub fn get_first_deciphered_message_with_max(
-    threadpool: &ThreadPool,
-    deciphered_messages: HashMap<usize, String>, 
+    &mut self,
     max: usize) -> Vec<String> {
-    let value = deciphered_messages.get(&0).unwrap().to_string();
-    let cloned_deciphered_messages = deciphered_messages.clone();
-    
-    let mut list_valid_messages: Vec<String> = Messages::decipher_string_to_list(&cloned_deciphered_messages, value);
+
+    let value = self.valid_messages.get(&0).unwrap().to_string();
+    self.valid_messages.insert(8, "42 | 42 8".to_string());
+    self.valid_messages.insert(11, "42 31 | 42 11 31".to_string());
+
+    let mut list_valid_messages: Vec<String> = self.decipher_string_to_list(value);
     let re = Regex::new(r"a|b").unwrap();
     loop {
-      //let max_flag = list_valid_messages.iter().any(|x| x.len() > max);
       let number_flag = list_valid_messages.iter()
         .any(|x| re.find_iter(x).count() > max - 1);
-      //println!("max flag {:?}, number flag {:?}, boolean: {:?}", max_flag, number_flag, !max_flag && number_flag);
       if number_flag {
         return list_valid_messages;
       }
-      list_valid_messages = Messages::decipher_list_to_list(&cloned_deciphered_messages, list_valid_messages);
+      list_valid_messages = self.decipher_list_to_list(list_valid_messages);
     }
   }
 
-  pub fn decipher_list_to_list(deciphered_messages: &HashMap<usize, String>, vector: Vec<String>) -> Vec<String> {
+  pub fn decipher_list_to_list(
+    &mut self,
+    vector: Vec<String>) -> Vec<String> {
     let mut list_valid_messages: Vec<String> = vec![];
+
     for message in vector.clone() {
-      list_valid_messages.extend(Messages::decipher_string_to_list(deciphered_messages, message));
+      list_valid_messages.extend(self.decipher_string_to_list(message));
     }
     return list_valid_messages;
   }
 
-  pub fn decipher_string_to_list(deciphered_messages: &HashMap<usize, String>, value: String) -> Vec<String> {
+  fn decipher_string_to_list(&mut self, value: String) -> Vec<String> {
 
     let vector: Vec<char> = value.chars().collect();
     let vector_size = vector.len();
@@ -96,7 +95,7 @@ impl Messages {
           index += 1;
         }
         
-        let content: String = deciphered_messages.get(&number).unwrap().trim().to_string();
+        let content: String = self.valid_messages.get(&number).unwrap().trim().to_string();
         if content.contains('|') {
           let pair_content: Vec<String> = content.split("|").map(|x| x.trim().to_string()).collect();
           if list_valid_messages.len() == 0 {
@@ -132,13 +131,12 @@ impl Messages {
     return list_valid_messages;
   }
 
-  pub fn get_intersepted_number(messages: Messages, deciphered_messages: Vec<String>) -> usize {
-    let set: HashSet<String> = HashSet::from_iter(messages.received_messages.iter().cloned());
+  pub fn get_intersepted_number(&mut self, deciphered_messages: Vec<String>) -> usize {
+    let set: HashSet<String> = HashSet::from_iter(self.received_messages.iter().cloned());
     let intersection: Vec<_> = deciphered_messages.iter()
       .map(|x| x.chars().filter(|c| !c.is_whitespace()).collect::<String>())
       .filter(|x| set.contains(&x.to_string()))
       .collect();
     return intersection.len();
   }
-
 }
