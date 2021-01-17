@@ -2,6 +2,7 @@ use std::{
   fmt::Debug,
   collections::{HashSet, HashMap},
   iter::FromIterator,
+  time::Instant,
 };
 use regex::Regex;
 
@@ -33,16 +34,24 @@ impl Messages {
 
   pub fn get_first_deciphered_message(&mut self) -> Vec<String> {
     let value = self.valid_messages.get(&0).unwrap().to_string();
-    
-    let mut list_valid_messages: Vec<String> = self.decipher_string_to_list(value);
-    let re = Regex::new(r"\d").unwrap();
-    loop {
-      let flag = list_valid_messages.iter().any(|x| re.is_match(x));
-      if !flag {
-        return list_valid_messages;
-      }
-      list_valid_messages = self.decipher_list_to_list(list_valid_messages);
+
+    let mut list_valid_messages: Vec<String> = vec![];
+    let mut list_valid_messages_to_iterate: Vec<String> = self.decipher_string_to_list(value);
+
+    let re_digit = Regex::new(r"\d").unwrap();
+    while list_valid_messages_to_iterate.len() != 0 {
+      list_valid_messages_to_iterate = self.decipher_list_to_list(
+        list_valid_messages_to_iterate.into_iter()
+        .filter(|x| {
+          if !re_digit.is_match(x) {
+            list_valid_messages.push(x.to_string());
+            return false;
+          }
+          return true;
+        }).collect()
+      );
     }
+    return list_valid_messages;
   }
 
   pub fn get_first_deciphered_message_with_max(
@@ -53,26 +62,40 @@ impl Messages {
     self.valid_messages.insert(8, "42 | 42 8".to_string());
     self.valid_messages.insert(11, "42 31 | 42 11 31".to_string());
 
-    let mut list_valid_messages: Vec<String> = self.decipher_string_to_list(value);
-    let re = Regex::new(r"a|b").unwrap();
-    loop {
-      let number_flag = list_valid_messages.iter()
-        .any(|x| re.find_iter(x).count() > max - 1);
-      if number_flag {
-        return list_valid_messages;
-      }
-      list_valid_messages = self.decipher_list_to_list(list_valid_messages);
+    let mut list_valid_messages: Vec<String> = vec![];
+    let mut list_valid_messages_to_iterate: Vec<String> = self.decipher_string_to_list(value);
+    //let re_a_b = Regex::new(r"a|b").unwrap();
+    let re_digit = Regex::new(r"\d").unwrap();
+    let mut max_exceeded = false;
+    while !max_exceeded {
+      list_valid_messages_to_iterate = self.decipher_list_to_list(
+        list_valid_messages_to_iterate.into_iter()
+          .filter(|x| {
+            if !re_digit.is_match(x) {
+              list_valid_messages.push(x.to_string());
+              if x.len() > max - 1 {
+                max_exceeded = true;
+              }
+              return false;
+            }
+            return true;
+          }).collect()
+      );
     }
+    return list_valid_messages;
   }
 
   pub fn decipher_list_to_list(
     &mut self,
     vector: Vec<String>) -> Vec<String> {
     let mut list_valid_messages: Vec<String> = vec![];
-
+    let now = Instant::now();
     for message in vector.clone() {
       list_valid_messages.extend(self.decipher_string_to_list(message));
     }
+
+    let new_now = Instant::now();
+    println!("the duration of each execution: {:?}", new_now.duration_since(now));
     return list_valid_messages;
   }
 

@@ -1,6 +1,7 @@
 use std::{
   io::{BufReader, BufRead},
-  fs::File
+  time::Instant,
+  fs::File,
 };
 
 use crate::tools::file_handler::get_buffer_file;
@@ -10,7 +11,10 @@ pub fn compute1() -> u64 {
   
   let path = "data/19th_day/input.txt";
   let mut monster_messages = get_monster_messages(path);
+  let now = Instant::now();
   let deciphered_messages = monster_messages.get_first_deciphered_message();
+  let new_now = Instant::now();
+  println!("the duration of first part:{:?}", new_now.duration_since(now));
   let intersepted_number = monster_messages.get_intersepted_number(deciphered_messages);
   return intersepted_number as u64;
 }
@@ -24,9 +28,10 @@ pub fn compute2() -> u64 {
   let mut valid_messages = monster_messages.clone().valid_messages;
   *valid_messages.get_mut(&8).unwrap() = "42 | 42 8".to_string();
   *valid_messages.get_mut(&11).unwrap() = "42 31 | 42 11 31".to_string();
-  println!("messages: {:?}", valid_messages);
+  let now = Instant::now();
   let deciphered_messages = monster_messages.get_first_deciphered_message_with_max(max);
-  println!("deciphered messages: {:?}", deciphered_messages);
+  let new_now = Instant::now();
+  println!("the duration of second part: {:?}", new_now.duration_since(now));
   let intersepted_number = monster_messages.get_intersepted_number(deciphered_messages);
   return intersepted_number as u64;
 }
@@ -69,17 +74,27 @@ mod test {
     println!("deciphered list: {:?}", deciphered_messages);
     assert_eq!(deciphered_messages, ["a a b", "a b a"]);
     
+
     // complext test
     let path = "data/19th_day/test_input.txt";
     let mut messages = get_monster_messages(path);
+
+    let now = Instant::now();
     let deciphered_messages = messages.get_first_deciphered_message();
+    let new_now = Instant::now();
+    println!("The duratin of first test first part: {:?}", new_now.duration_since(now));
     let intersepted_number = messages.get_intersepted_number(deciphered_messages);
     assert_eq!(intersepted_number, 2);
+
 
     // more complext test that received for the second part
     let path2 = "data/19th_day/test2_input.txt";
     let mut messages2 = get_monster_messages(path2);
+
+    let now2 = Instant::now();
     let deciphered_messages2 = messages2.get_first_deciphered_message();
+    let new_now2 = Instant::now();
+    println!("The duratin of first test second part: {:?}", new_now2.duration_since(now2));
     let intersepted_number2 = messages2.get_intersepted_number(deciphered_messages2);
     assert_eq!(intersepted_number2, 3);
   }
@@ -93,17 +108,34 @@ mod test {
     first_messages.append_valid_message("1: \"a\"".to_string());
     first_messages.append_valid_message("2: 1 3 | 3 2 1".to_string());
     first_messages.append_valid_message("3: \"b\"".to_string());
-    let max = 3;
-    let deciphered_messages = first_messages.get_first_deciphered_message_with_max(max);
-    assert_eq!(deciphered_messages, ["a a b", "a b 1 3 a", "a b 3 2 1 a"]);
+    let deciphered_messages = first_messages.get_first_deciphered_message_with_max(3);
+    assert_eq!(deciphered_messages, ["a a b"]);
 
-    // complex test    
+
+    // complext test
+    let path = "data/19th_day/test_input.txt";
+    let mut messages = get_monster_messages(path);
+    let max = messages.received_messages.iter().fold(0, |acc, x| if acc > x.len() {acc} else {x.len()});
+    assert_eq!(max, 7);
+
+    let now = Instant::now();
+    let deciphered_messages = messages.get_first_deciphered_message_with_max(max);
+    let new_now = Instant::now();
+    println!("The duratin of first test first part: {:?}", new_now.duration_since(now));
+    let intersepted_number = messages.get_intersepted_number(deciphered_messages);
+    assert_eq!(intersepted_number, 2);
+
+
+    // more complex test
     let path2 = "data/19th_day/test2_input.txt";
     let mut messages2 = get_monster_messages(path2);
     let max2 = messages2.received_messages.iter().fold(0, |acc, x| if acc > x.len() {acc} else {x.len()});
     assert_eq!(max2, 45);
-    
+
+    let now2 = Instant::now();
     let deciphered_messages2 = messages2.get_first_deciphered_message_with_max(max2);
+    let new_now2 = Instant::now();
+    println!("The duratin of second test second part: {:?}", new_now2.duration_since(now2));
     let intersepted_number2 = messages2.get_intersepted_number(deciphered_messages2);
     assert_eq!(intersepted_number2, 12);
   }
