@@ -61,6 +61,7 @@ mod test {
   use super::*;
 
   #[test]
+  #[ignore]
   fn test_part1() {
 
     // simple test
@@ -100,6 +101,7 @@ mod test {
   }
 
   #[test]
+  #[ignore]
   fn test_part2() {
 
     // simple test

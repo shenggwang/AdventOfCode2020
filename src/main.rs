@@ -1,6 +1,8 @@
+use std::io::{stdin};
 extern crate regex;
 
 pub mod tools;
+pub mod aoc_0th_day;
 pub mod aoc_1st_day;
 pub mod aoc_2nd_day;
 pub mod aoc_3rd_day;
@@ -22,25 +24,40 @@ pub mod aoc_18th_day;
 pub mod aoc_19th_day;
 
 fn main() {
-  //first_day();
-  //second_day();
-  //third_day();
-  //fourth_day();
-  //fifth_day();
-  //sixth_day();
-  //seventh_day();
-  //eighth_day();
-  //nineth_day();
-  //tenth_day();
-  //eleventh_day();
-  //twelfth_day();
-  //thirteenth_day();
-  //fourteenth_day();
-  //fifteenth_day();
-  //sixteenth_day();
-  //seventeenth_day();
-  //eighteenth_day();
-  nineteenth_day();
+  let mut buffer = String::new();
+  stdin().read_line(&mut buffer).expect("Failed reading line");
+  let input = buffer.trim().parse::<u8>().unwrap();
+  match input {
+    0 => zeroth_day(),
+    1 => first_day(),
+    2 => second_day(),
+    3 => third_day(),
+    4 => fourth_day(),
+    5 => fifth_day(),
+    6 => sixth_day(),
+    7 => seventh_day(),
+    8 => eighth_day(),
+    9 => nineth_day(),
+    10 => tenth_day(),
+    11 => eleventh_day(),
+    12 => twelfth_day(),
+    13 => thirteenth_day(),
+    14 => fourteenth_day(),
+    15 => fifteenth_day(),
+    16 => sixteenth_day(),
+    17 => seventeenth_day(),
+    18 => eighteenth_day(),
+    19 => nineteenth_day(),
+    _ => println!("Option {} not found", input),
+  }
+}
+
+#[allow(dead_code)]
+fn zeroth_day() {
+  println!(
+    "Zeroth day value: {:?}",
+    aoc_0th_day::cumulative_calculation::compute1()
+  );
 }
 
 #[allow(dead_code)]

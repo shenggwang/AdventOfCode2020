@@ -77,8 +77,8 @@ mod test {
   }
 
   #[test]
+  #[ignore]
   fn test_part2() {
-    /* Performance issue here.
     let test_input1 = "0,3,6".to_string();
     assert_eq!(number_at_give_value(test_input1, 30000000), 175594);
     let test_input2 = "1,3,2".to_string();
@@ -93,6 +93,5 @@ mod test {
     assert_eq!(number_at_give_value(test_input6, 30000000), 18);
     let test_input7 = "3,1,2".to_string();
     assert_eq!(number_at_give_value(test_input7, 30000000), 362);
-    */
   }
 }
