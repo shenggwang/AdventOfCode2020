@@ -19,10 +19,42 @@ pub fn compute1() -> usize {
   return compound_return(initial, percent, years);
 }
 
+pub fn compute2() -> usize {
+  let mut buffer1 = String::new();
+  let mut buffer2 = String::new();
+  let mut buffer3 = String::new();
+  println!("Write the yearly deposit value below:");
+  stdin().read_line(&mut buffer1).expect("Failed reading line");
+  let deposit = buffer1.trim().parse::<f64>().unwrap();
+
+  println!("Write the percent below:");
+  stdin().read_line(&mut buffer2).expect("Failed reading line");
+  let percent = buffer2.trim().parse::<f64>().unwrap();
+
+  println!("Write the years below:");
+  stdin().read_line(&mut buffer3).expect("Failed reading line");
+  let years = buffer3.trim().parse::<u16>().unwrap();
+  println!("Yearly deposit is {} and percent is {} within {} years", deposit, percent, years);
+
+  return compound_return_with_one_percent_fee_plus(deposit, percent, years);
+}
+
 pub fn compound_return(initial: f64, percent: f64, years: u16) -> usize {
   let mut value = initial;
   for i in 1..=years {
     value = value + value * (percent / 100.0);
+    if i % 10 == 0 || i == years {
+      println!("value is {} in {} years", value, i);
+    }
+  }
+  return value.round() as usize;
+}
+
+pub fn compound_return_with_one_percent_fee_plus(deposit: f64, percent: f64, years: u16) -> usize {
+  let mut value = deposit;
+  for i in 1..=years {
+    value = value + value * (percent / 100.0) + deposit;
+    value = value - value * 0.01;
     if i % 10 == 0 || i == years {
       println!("value is {} in {} years", value, i);
     }

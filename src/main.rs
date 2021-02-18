@@ -25,6 +25,7 @@ pub mod aoc_19th_day;
 
 fn main() {
   let mut buffer = String::new();
+  println!("Choose between 1 until 19 to get the output:");
   stdin().read_line(&mut buffer).expect("Failed reading line");
   let input = buffer.trim().parse::<u8>().unwrap();
   match input {
@@ -54,10 +55,21 @@ fn main() {
 
 #[allow(dead_code)]
 fn zeroth_day() {
-  println!(
-    "Zeroth day value: {:?}",
-    aoc_0th_day::cumulative_calculation::compute1()
-  );
+  let mut buffer = String::new();
+  println!("Zeroth day: choose 1- normal calculation, 2- fee and yearly deposit calculation");
+  stdin().read_line(&mut buffer).expect("Failed reading line");
+  let input = buffer.trim().parse::<u8>().unwrap();
+  match input {
+    1 =>  println!(
+            "Zeroth day first part value: {:?}",
+            aoc_0th_day::cumulative_calculation::compute1()
+          ),
+    2 =>  println!(
+            "Zeroth day second part value: {:?}",
+            aoc_0th_day::cumulative_calculation::compute2()
+          ),
+    _ => println!("Option {} not found", input),
+  }
 }
 
 #[allow(dead_code)]
