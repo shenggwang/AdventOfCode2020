@@ -61,10 +61,8 @@ mod test {
   use super::*;
 
   #[test]
-  #[ignore]
   fn test_part1() {
 
-    // simple test
     let mut first_messages = Messages::new();
     first_messages.append_valid_message("0: 1 2".to_string());
     first_messages.append_valid_message("1: \"a\"".to_string());
@@ -73,10 +71,14 @@ mod test {
     println!("first messages: {:?}", first_messages);
     let deciphered_messages = first_messages.get_first_deciphered_message();
     println!("deciphered list: {:?}", deciphered_messages);
-    assert_eq!(deciphered_messages, ["a a b", "a b a"]);
-    
+    let mut list = deciphered_messages.iter();
+    assert_eq!(list.next(), Some(&"a a b".to_string()));
+    assert_eq!(list.next(), Some(&"a b a".to_string()));
+  }
 
-    // complext test
+  #[test]
+  fn test_part1_complex() {
+
     let path = "data/19th_day/test_input.txt";
     let mut messages = get_monster_messages(path);
 
@@ -86,9 +88,11 @@ mod test {
     println!("The duratin of first test first part: {:?}", new_now.duration_since(now));
     let intersepted_number = messages.get_intersepted_number(deciphered_messages);
     assert_eq!(intersepted_number, 2);
+  }
 
+  #[test]
+  fn test_part1_more_complex() {
 
-    // more complext test that received for the second part
     let path2 = "data/19th_day/test2_input.txt";
     let mut messages2 = get_monster_messages(path2);
 
@@ -101,20 +105,21 @@ mod test {
   }
 
   #[test]
-  #[ignore]
   fn test_part2() {
 
-    // simple test
     let mut first_messages = Messages::new();
     first_messages.append_valid_message("0: 1 2".to_string());
     first_messages.append_valid_message("1: \"a\"".to_string());
     first_messages.append_valid_message("2: 1 3 | 3 2 1".to_string());
     first_messages.append_valid_message("3: \"b\"".to_string());
     let deciphered_messages = first_messages.get_first_deciphered_message_with_max(3);
-    assert_eq!(deciphered_messages, ["a a b"]);
+    let mut list = deciphered_messages.iter();
+    assert_eq!(list.next(), Some(&"a a b".to_string()));
+  }
 
+  #[test]
+  fn test_part2_complex() {
 
-    // complext test
     let path = "data/19th_day/test_input.txt";
     let mut messages = get_monster_messages(path);
     let max = messages.received_messages.iter().fold(0, |acc, x| if acc > x.len() {acc} else {x.len()});
@@ -126,9 +131,12 @@ mod test {
     println!("The duratin of first test first part: {:?}", new_now.duration_since(now));
     let intersepted_number = messages.get_intersepted_number(deciphered_messages);
     assert_eq!(intersepted_number, 2);
+  }
 
+  #[test]
+  #[ignore]
+  fn test_part2_more_complex() {
 
-    // more complex test
     let path2 = "data/19th_day/test2_input.txt";
     let mut messages2 = get_monster_messages(path2);
     let max2 = messages2.received_messages.iter().fold(0, |acc, x| if acc > x.len() {acc} else {x.len()});
